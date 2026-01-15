@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Down Detector</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: #f0f0f0; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 30px; }
+    .account-holder { border: 1px solid #444; padding: 15px; margin-bottom: 20px; border-radius: 12px; text-align: center; }
+    .project { border: 1px solid #444; padding: 15px; margin: 10px 0; border-radius: 12px; }
+    .project h2 { margin: 0 0 15px; }
+    a { color: #4ea1f3; text-decoration: none; }
+    .link-label { font-weight: bold; margin-right: 5px; }
+    .status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 14px;
+        margin-left: 10px;
+        color: #fff;
+        position: relative;
+    }
+    .up { background-color: #0f0; }
+    .down { background-color: #f00; }
+    .status::before {
+        content: attr(data-arrow);
+        display: inline-flex;
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.3); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.6; }
+    }
+</style>
+</head>
+<body>
+
+<h1>Down Detector</h1>
+
+<div class="account-holder">
+    <h2>Account Holder</h2>
+    <p><a href="https://github.com/AC1DST4R" target="_blank">https://github.com/AC1DST4R</a></p>
+</div>
+
+<div id="projects"></div>
+
+<script>
+// === CONFIGURATION ===
+const WEBHOOK_URL = "https://your-webhook-url.com"; // <-- Replace with your webhook
+
+const projects = [
+    { name: "LinkTree", repo: "https://github.com/AC1DST4R/Linktree/", website: "https://ac1dst4r.github.io/Linktree/", lastStatus: {} },
+    { name: "Web Ports", repo: "https://github.com/AC1DST4R/Web-Ports", website: "https://ac1dst4r.github.io/Web-Ports", lastStatus: {} },
+    { name: "Minecraft Port", repo: "https://github.com/AC1DST4R/Minecraft", website: "https://ac1dst4r.github.io/Minecraft", lastStatus: {} },
+    { name: "C00lGUI", repo: "https://github.com/AC1DST4R/C00lGUI", website: "https://ac1dst4r.github.io/C00lGUI", lastStatus: {} },
+    { name: "FATED", repo: "https://github.com/AC1DST4R/FATED", website: "https://ac1dst4r.github.io/FATED/Home", lastStatus: {} },
+    { name: "Service Hour Tracker", repo: "https://github.com/AC1DST4R/Service-Hour-Tracker", website: "https://ac1dst4r.github.io/Service-Hour-Tracker", lastStatus: {} },
+    { name: "Code Sandbox", repo: "https://github.com/AC1DST4R/Code-Sandbox", website: "https://ac1dst4r.github.io/Code-Sandbox", lastStatus: {} }
+];
+
+const container = document.getElementById("projects");
+
+projects.forEach(project => {
+    const div = document.createElement("div");
+    div.className = "project";
+    div.innerHTML = `
+        <h2>${project.name}</h2>
+        <p><span class="link-label">Repository:</span> <a href="${project.repo}" target="_blank">${project.repo}</a> <span class="status" id="${project.name}-repo" data-arrow="^">Checking...</span></p>
+        <p><span class="link-label">Website:</span> <a href="${project.website}" target="_blank">${project.website}</a> <span class="status" id="${project.name}-website" data-arrow="^">Checking...</span></p>
+    `;
+    container.appendChild(div);
+});
+
+// Function to send webhook
+async function sendWebhook(projectName, type, status) {
+    if (!WEBHOOK_URL) return;
+    try {
+        await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                project: projectName,
+                type: type,
+                status: status,
+                timestamp: new Date().toISOString()
+            })
+        });
+        console.log(`Webhook sent: ${projectName} - ${type} is ${status}`);
+    } catch (e) {
+        console.error("Webhook error:", e);
+    }
+}
+
+// Function to check status
+async function checkStatus(project, key, url) {
+    let el = document.getElementById(`${project.name}-${key}`);
+    try {
+        await fetch(url, { method: "HEAD", mode: "no-cors" });
+        // Up
+        el.textContent = "Up";
+        el.dataset.arrow = "^";
+        el.className = "status up";
+
+        // Send webhook only if status changed
+        if (project.lastStatus[key] !== "Up") {
+            sendWebhook(project.name, key, "Up");
+        }
+        project.lastStatus[key] = "Up";
+
+    } catch (e) {
+        // Down
+        el.textContent = "Down";
+        el.dataset.arrow = "v";
+        el.className = "status down";
+
+        // Send webhook only if status changed
+        if (project.lastStatus[key] !== "Down") {
+            sendWebhook(project.name, key, "Down");
+        }
+        project.lastStatus[key] = "Down";
+    }
+}
+
+// Check all projects
+function checkAll() {
+    projects.forEach(project => {
+        checkStatus(project, "repo", project.repo);
+        checkStatus(project, "website", project.website);
+    });
+}
+
+// Initial check
+checkAll();
+
+// Auto-refresh every 30 seconds
+setInterval(checkAll, 30000);
+
+</script>
+
+</body>
+</html>
