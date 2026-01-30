@@ -1,0 +1,72 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get install -y jq curl
+
+      - name: Check sites & send alerts
+        run: |
+          STATUS_FILE=public/status.json
+          
+          # Ensure file exists
+          if [ ! -f "$STATUS_FILE" ]; then
+            echo '{"updated":"", "projects":[]}' > $STATUS_FILE
+          fi
+
+          tmpfile=$(mktemp)
+
+          # Function to check one project
+          check() {
+            NAME="$1"
+            URL="$2"
+
+            if curl -Is --max-time 10 "$URL" | grep -q "200"; then
+              STATUS="Up"
+            else
+              STATUS="Down"
+            fi
+
+            # Previous status
+            PREV=$(jq -r --arg name "$NAME" '.projects[] | select(.name==$name) | .status // empty' $STATUS_FILE)
+
+            # Send webhook only if changed
+            if [ "$STATUS" != "$PREV" ]; then
+              echo "State change for $NAME: $PREV → $STATUS"
+              curl -X POST "${{ secrets.WEBHOOK_KEY }}" \
+                -H "Content-Type: application/json" \
+                -d "{\"project\":\"$NAME\",\"status\":\"$STATUS\",\"url\":\"$URL\",\"previous\":\"$PREV\"}"
+            fi
+
+            # Update JSON
+            jq --arg name "$NAME" --arg url "$URL" --arg status "$STATUS" '
+              .projects |= (map(select(.name != $name)) + [{"name": $name, "url": $url, "status": $status}])
+            ' $STATUS_FILE > "$tmpfile" && mv "$tmpfile" $STATUS_FILE
+          }
+
+          # List of projects
+          check "Apps" "https://ac1dst4r.github.io/Apps/"
+          check "Web Ports" "https://ac1dst4r.github.io/Web-Ports"
+          check "Minecraft Port" "https://ac1dst4r.github.io/Minecraft"
+          check "C00lGUI" "https://ac1dst4r.github.io/C00lGUI"
+
+          # Update timestamp
+          jq --arg t "$(date -u +%FT%TZ)" '.updated=$t' $STATUS_FILE > "$tmpfile" && mv "$tmpfile" $STATUS_FILE
+
+      - name: Commit status.json
+        run: |
+          git config user.name "uptime-bot"
+          git config user.email "bot@github.com"
+          git add public/status.json
+          git commit -m "Update status" || exit 0
+          git push
