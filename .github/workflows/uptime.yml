@@ -74,7 +74,10 @@ jobs:
           check "Apps" "https://ac1dst4r.github.io/Apps/"
           check "Web Ports" "https://ac1dst4r.github.io/Web-Ports"
           check "Minecraft Port" "https://ac1dst4r.github.io/Minecraft"
-          check "C00lGUI" "https://ac1dst4r.github.io/C00lGUI"
+          check "FATED" "https://ac1dst4r.github.io/FATED"
+          check "Service Hour Tracker" "https://ac1dst4r.github.io/Service-Hour-Tracker"
+          check "Code Sandbox" "https://ac1dst4r.github.io/Code-Sandbox"
+          check "Webhookd" "https://ac1dst4r.github.io/Webhookd"
 
           jq --arg t "$(date -u +%FT%TZ)" '.updated=$t' "$STATUS_FILE" > "$tmpfile" && mv "$tmpfile" "$STATUS_FILE"
 
