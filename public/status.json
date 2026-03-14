@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-14T16:58:34Z",
+  "updated": "2026-03-14T17:24:30Z",
   "projects": [
     {
       "name": "C00lGUI",
@@ -9,7 +9,7 @@
     {
       "name": "Apps",
       "url": "https://ac1dst4r.github.io/Apps/",
-      "status": "Down"
+      "status": "Up"
     },
     {
       "name": "Web Ports",
