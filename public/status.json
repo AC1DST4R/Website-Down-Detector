@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-02T01:36:54Z",
+  "updated": "2026-06-02T06:17:29Z",
   "projects": [
     {
       "name": "C00lGUI",
@@ -24,7 +24,7 @@
     {
       "name": "FATED",
       "url": "https://ac1dst4r.github.io/FATED",
-      "status": "Up"
+      "status": "Down"
     },
     {
       "name": "Service Hour Tracker",
