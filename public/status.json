@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T15:32:33Z",
+  "updated": "2026-08-24T16:05:28Z",
   "projects": [
     {
       "name": "C00lGUI",
@@ -14,7 +14,7 @@
     {
       "name": "Web Ports",
       "url": "https://ac1dst4r.github.io/Web-Ports",
-      "status": "Down"
+      "status": "Up"
     },
     {
       "name": "Minecraft Port",
