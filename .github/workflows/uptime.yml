@@ -36,29 +36,22 @@ jobs:
           for PAGE in $(seq 1 10); do
             printf -v PAGE_FILE ".status-work/repos-%02d.json" "$PAGE"
 
-            curl -fsSL \
-              --retry 3 \
-              --retry-delay 2 \
+            curl -fsSL --retry 3 --retry-delay 2 \
               "https://api.github.com/users/${OWNER}/repos?type=owner&per_page=100&sort=updated&page=${PAGE}" \
               -o "$PAGE_FILE"
 
             jq -e 'type == "array"' "$PAGE_FILE" >/dev/null
 
             COUNT="$(jq 'length' "$PAGE_FILE")"
-
             if [ "$COUNT" -lt 100 ]; then
               break
             fi
           done
 
-          jq -s 'add' .status-work/repos-*.json \
-            > .status-work/all-repos.json
-
+          jq -s 'add' .status-work/repos-*.json > .status-work/all-repos.json
           NOW="$(date -u +%s)"
 
-          jq \
-            --argjson now "$NOW" \
-            '
+          jq --argjson now "$NOW" '
             [
               .[]
               | select(.private == false)
@@ -67,9 +60,7 @@ jobs:
               | select(.disabled == false)
               | select(
                   (
-                    .name
-                    | ascii_downcase
-                    | gsub("[^a-z0-9]"; "")
+                    .name | ascii_downcase | gsub("[^a-z0-9]"; "")
                   ) as $n
                   | (
                       [
@@ -79,45 +70,29 @@ jobs:
                         "fileencoderv2",
                         "gitchatv2",
                         "githubv2development"
-                      ]
-                      | index($n)
+                      ] | index($n)
                     ) == null
                 )
               | select(
                   (
-                    .name
-                    | ascii_downcase
-                    | gsub("[^a-z0-9]"; "")
-                  )
-                  | test("^graphitev[0-9]+$") | not
+                    .name | ascii_downcase | gsub("[^a-z0-9]"; "")
+                  ) | test("^graphitev[0-9]+$") | not
                 )
               | select(
                   (
-                    (
-                      .name + " " +
-                      (.description // "") + " " +
-                      ((.topics // []) | join(" "))
-                    )
-                    | test(
-                        "(browser|firefox|chrome|extension|webextension|addon|add-on)";
-                        "i"
-                      )
+                    (.name + " " + (.description // "") + " " + ((.topics // []) | join(" ")))
+                    | test("(browser|firefox|chrome|extension|webextension|addon|add-on)"; "i")
                   ) | not
                 )
               | select(
                   .pushed_at != null
-                  and (
-                    $now - (.pushed_at | fromdateiso8601)
-                  ) <= 31536000
+                  and (($now - (.pushed_at | fromdateiso8601)) <= 31536000)
                 )
             ]
-            ' .status-work/all-repos.json \
-            > eligible-repos.json
+          ' .status-work/all-repos.json > eligible-repos.json
 
-          echo "Eligible repositories:"
+          echo "Eligible repositories: $(jq 'length' eligible-repos.json)"
           jq -r '.[].name' eligible-repos.json
-
-          echo "Total eligible repositories: $(jq 'length' eligible-repos.json)"
 
       - name: Check repositories and websites
         shell: bash
@@ -159,7 +134,6 @@ jobs:
               else
                 SITE_URL="https://ac1dst4r.github.io/${NAME}/"
               fi
-
               WEBSITE_STATUS="$(check_url "$SITE_URL")"
             else
               SITE_URL=""
@@ -193,37 +167,99 @@ jobs:
               }' >> .status-work/status-lines.jsonl
 
             echo "${NAME}: repository=${REPO_STATUS}, website=${WEBSITE_STATUS}"
-
           done < <(jq -c '.[]' eligible-repos.json)
 
           jq -s \
             --arg updated "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-            '{
-              updated: $updated,
-              projects: .
-            }' .status-work/status-lines.jsonl \
-            > .status-work/new-status.json
+            '{updated: $updated, projects: .}' \
+            .status-work/status-lines.jsonl > .status-work/new-status.json
 
           if [ -f public/status.json ]; then
-            jq -S '.projects // []' public/status.json \
-              > .status-work/old-projects.json
+            jq -S '.projects // []' public/status.json > .status-work/old-projects.json
           else
             printf '[]\n' > .status-work/old-projects.json
           fi
 
-          jq -S '.projects' .status-work/new-status.json \
-            > .status-work/new-projects.json
+          jq -S '.projects' .status-work/new-status.json > .status-work/new-projects.json
 
-          if ! cmp -s \
-            .status-work/old-projects.json \
-            .status-work/new-projects.json; then
+          if ! cmp -s .status-work/old-projects.json .status-work/new-projects.json; then
             cp .status-work/new-status.json public/status.json
-            echo "Project statuses changed."
+            echo "Updated public/status.json"
           else
-            echo "No project status changes detected."
+            echo "Project statuses have not changed."
           fi
 
-      - name: Commit updated status
+      - name: Record uptime history
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p public .status-work
+          HISTORY="public/uptime-history.json"
+          NOW="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          NOW_EPOCH="$(date -u +%s)"
+
+          if [ ! -f "$HISTORY" ]; then
+            printf '{"updated":null,"samples":[]}\n' > "$HISTORY"
+          fi
+
+          LAST_TS="$(jq -r '.samples[-1].timestamp // empty' "$HISTORY")"
+
+          if [ -n "$LAST_TS" ]; then
+            LAST_EPOCH="$(date -u -d "$LAST_TS" +%s 2>/dev/null || echo 0)"
+          else
+            LAST_EPOCH=0
+          fi
+
+          if [ "$LAST_EPOCH" -gt 0 ] && [ $((NOW_EPOCH - LAST_EPOCH)) -lt 3600 ]; then
+            echo "An hourly sample already exists. Skipping history append."
+            exit 0
+          fi
+
+          COUNTS="$(jq '
+            [.projects[] | .repoStatus, .websiteStatus]
+            | map(select(. == "Up" or . == "Down"))
+            | {
+                up: map(select(. == "Up")) | length,
+                down: map(select(. == "Down")) | length,
+                total: length
+              }
+          ' public/status.json)"
+
+          UP="$(jq '.up' <<< "$COUNTS")"
+          DOWN="$(jq '.down' <<< "$COUNTS")"
+          TOTAL="$(jq '.total' <<< "$COUNTS")"
+
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "No known checks are available. Skipping this history sample."
+            exit 0
+          fi
+
+          UPTIME="$(awk -v up="$UP" -v total="$TOTAL" 'BEGIN { printf "%.4f", (up / total) * 100 }')"
+
+          jq \
+            --arg timestamp "$NOW" \
+            --argjson uptime "$UPTIME" \
+            --argjson up "$UP" \
+            --argjson down "$DOWN" \
+            --argjson total "$TOTAL" \
+            '
+              .samples = (
+                (.samples // []) + [{
+                  timestamp: $timestamp,
+                  uptime: $uptime,
+                  up: $up,
+                  down: $down,
+                  total: $total
+                }]
+              )
+              | .updated = $timestamp
+            ' "$HISTORY" > .status-work/new-history.json
+
+          mv .status-work/new-history.json "$HISTORY"
+          echo "Recorded uptime: ${UPTIME}% (${UP} up, ${DOWN} down)"
+
+      - name: Commit updated status and history
         shell: bash
         run: |
           set -euo pipefail
@@ -231,12 +267,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add public/status.json
+          git add public/status.json public/uptime-history.json
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "Update website status"
+          git commit -m "Update website status and uptime history"
           git push
