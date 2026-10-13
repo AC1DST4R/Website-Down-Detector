@@ -1,143 +1,651 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Down Detector</title>
+<meta name="theme-color" content="#090b10">
+<meta name="description" content="Live uptime monitoring for public AC1DST4R projects and websites.">
+<title>AC1DST4R Status Center</title>
 <style>
-    body { font-family: Arial, sans-serif; background: #1e1e1e; color: #f0f0f0; padding: 20px; }
-    h1 { text-align: center; margin-bottom: 30px; }
-    .account-holder { border: 1px solid #444; padding: 15px; margin-bottom: 20px; border-radius: 12px; text-align: center; }
-    .project { border: 1px solid #444; padding: 15px; margin: 10px 0; border-radius: 12px; }
-    .project h2 { margin: 0 0 15px; }
-    a { color: #4ea1f3; text-decoration: none; }
-    .link-label { font-weight: bold; margin-right: 5px; }
-    .status {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 60px;
-        height: 30px;
-        padding: 0 12px;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 14px;
-        margin-left: 10px;
-        color: #fff;
-        position: relative;
+:root {
+    color-scheme: dark;
+    --bg: #090b10;
+    --panel: #10141c;
+    --panel-hover: #151b26;
+    --border: #252c39;
+    --text: #f0f3f8;
+    --muted: #8d98aa;
+    --accent: #8b9cff;
+    --green: #43d9a3;
+    --red: #ff647c;
+    --yellow: #ffc66d;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 36px 22px 24px;
+    background:
+        radial-gradient(ellipse at 50% -15%, #222d4a 0%, transparent 55%),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--accent); }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
+.container { max-width: 1120px; margin: 0 auto; }
+header { margin-bottom: 30px; }
+.topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 38px;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+}
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #424c6a;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #293451, #151b2b);
+    color: #b8c3ff;
+    font-size: 20px;
+}
+.eyebrow {
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+h1 {
+    margin: 12px 0 10px;
+    font-size: clamp(34px, 6vw, 54px);
+    line-height: 1.08;
+    letter-spacing: -2px;
+}
+.subtitle {
+    max-width: 620px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+.account-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #b9c4d6;
+    font-size: 13px;
+}
+.overview {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 14px;
+    margin: 28px 0 32px;
+}
+.metric {
+    min-width: 0;
+    padding: 21px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: linear-gradient(145deg, #141923, #0e1118);
+}
+.metric-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+.metric-value {
+    display: block;
+    margin-top: 13px;
+    font-size: 27px;
+    font-weight: 750;
+    letter-spacing: -.7px;
+}
+.metric-value.small { font-size: 21px; }
+.metric-detail {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 12px;
+}
+.live-dot, .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--yellow);
+}
+.live-dot {
+    margin-right: 8px;
+    background: var(--green);
+    box-shadow: 0 0 12px #43d9a355;
+}
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 15px;
+}
+.section-heading h2 { margin: 0; font-size: 19px; }
+.section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+.actions { display: flex; align-items: center; gap: 10px; }
+.search {
+    width: 210px;
+    max-width: 45vw;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    background: #10141c;
+    color: var(--text);
+}
+.search:focus { border-color: #7888d9; }
+.refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 14px;
+    border: 1px solid #39445d;
+    border-radius: 10px;
+    background: #1a2233;
+    color: #dce3ff;
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+.refresh:hover { background: #252f46; }
+.refresh:active { transform: scale(.97); }
+.refresh:disabled { opacity: .6; cursor: wait; }
+.projects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+}
+.project {
+    min-width: 0;
+    padding: 19px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: linear-gradient(145deg, #131821, #0e1117);
+    transition: border-color .2s, transform .2s, background .2s;
+}
+.project:hover {
+    border-color: #414d66;
+    background: var(--panel-hover);
+    transform: translateY(-2px);
+}
+.project-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.project h3 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: 16px;
+    font-weight: 700;
+}
+.project-description {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #171c25;
+    font-size: 11px;
+    font-weight: 750;
+}
+.badge .status-dot { width: 7px; height: 7px; }
+.badge.up { color: var(--green); border-color: #245343; background: #10271f; }
+.badge.up .status-dot { background: var(--green); }
+.badge.down { color: var(--red); border-color: #63303b; background: #2b151b; }
+.badge.down .status-dot { background: var(--red); }
+.badge.checking { color: var(--yellow); }
+.badge.checking .status-dot { background: var(--yellow); animation: pulse 1.5s infinite; }
+.badge.unknown { color: #aab4c4; }
+.badge.unknown .status-dot { background: #778397; }
+.links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+.project-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid #292f3b;
+    border-radius: 10px;
+    background: #0c1016;
+    color: #aebbd0;
+    font-size: 12px;
+    transition: border-color .2s;
+}
+.project-link:hover { border-color: #6574b2; }
+.project-link span { overflow-wrap: anywhere; }
+.project-link strong { color: #8f9fc4; font-size: 11px; }
+.project-link.disabled { opacity: .5; cursor: default; }
+.empty {
+    grid-column: 1 / -1;
+    padding: 35px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    color: var(--muted);
+    text-align: center;
+}
+.notice {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 42px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+}
+footer a { color: #b4c0d7; }
+@keyframes pulse {
+    50% { opacity: .35; }
+}
+@media (max-width: 720px) {
+    body { padding: 24px 15px; }
+    .topline { margin-bottom: 30px; }
+    .overview { grid-template-columns: 1fr 1fr; }
+    .metric:first-child { grid-column: 1 / -1; }
+    .projects { grid-template-columns: 1fr; }
+    .section-heading { align-items: flex-start; flex-direction: column; }
+    .actions { width: 100%; }
+    .search { width: 100%; max-width: none; flex: 1; }
+}
+@media (max-width: 380px) {
+    .overview { gap: 8px; }
+    .metric { padding: 15px; }
+    .metric-value { font-size: 23px; }
+    .project { padding: 15px; }
+    .links { gap: 6px; }
+    .project-link { padding: 10px 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
     }
-    .up { background-color: #0f0; }
-    .down { background-color: #f00; }
-    .status::before {
-        content: attr(data-arrow);
-        display: inline-flex;
-        width: 16px;
-        height: 16px;
-        margin-right: 6px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 0.6; }
-        50% { transform: scale(1.3); opacity: 1; }
-        100% { transform: scale(1); opacity: 0.6; }
-    }
+}
 </style>
 </head>
 <body>
+<div class="container">
+    <header>
+        <div class="topline">
+            <a class="brand" href="https://ac1dst4r.github.io/">
+                <span class="brand-icon">✦</span>
+                <span>AC1DST4R <span style="color:var(--muted);font-weight:500">/ Status</span></span>
+            </a>
+            <a class="account-link" href="https://github.com/AC1DST4R" target="_blank" rel="noopener noreferrer">
+                GitHub ↗
+            </a>
+        </div>
 
-<h1>Down Detector</h1>
+        <div class="eyebrow">System monitoring</div>
+        <h1>Status Center<span style="color:var(--accent)">.</span></h1>
+        <div class="subtitle">
+            A live overview of public projects, repositories, and deployed websites.
+            One dashboard. No guesswork.
+        </div>
 
-<div class="account-holder">
-    <h2>Account Holder</h2>
-    <p><a href="https://github.com/AC1DST4R" target="_blank">https://github.com/AC1DST4R</a></p>
+        <div class="overview">
+            <div class="metric">
+                <div class="metric-label">OVERALL STATUS</div>
+                <span class="metric-value small" id="overall">
+                    <span class="live-dot"></span>Loading systems
+                </span>
+                <span class="metric-detail" id="overall-detail">Waiting for the first status check</span>
+            </div>
+            <div class="metric">
+                <div class="metric-label">PUBLIC PROJECTS</div>
+                <span class="metric-value" id="project-count">--</span>
+                <span class="metric-detail">Configured projects</span>
+            </div>
+            <div class="metric">
+                <div class="metric-label">LAST UPDATED</div>
+                <span class="metric-value small" id="last-updated">Never</span>
+                <span class="metric-detail" id="updated-detail">Waiting for a successful check</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="section-heading">
+            <div>
+                <h2>Monitored projects</h2>
+                <p>Repository and website availability</p>
+            </div>
+            <div class="actions">
+                <input class="search" id="search" type="search" placeholder="Search projects..." aria-label="Search projects">
+                <button class="refresh" id="refresh" type="button">
+                    <span id="refresh-icon">↻</span> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="projects" id="projects" aria-live="polite"></div>
+        <p class="notice" id="notice">
+            Status information is provided by the configured monitoring source.
+        </p>
+    </main>
+
+    <footer>
+        <span>© <span id="year"></span> AC1DST4R</span>
+        <span>Built for the open web. <a href="https://github.com/AC1DST4R">View repositories ↗</a></span>
+    </footer>
 </div>
 
-<div id="projects"></div>
-
 <script>
-// ===== Helper =====
-function safeId(str) {
-    return str.toLowerCase().replace(/[^a-z0-9]/g, '-');
-}
+"use strict";
 
-// ===== List of projects (for display) =====
+const OWNER = "AC1DST4R";
+const STATUS_URL = "public/status.json";
+const REFRESH_INTERVAL = 30000;
+
+/*
+ * Only include projects confirmed to be public.
+ * Change repo or site when a repository or Pages URL uses another slug.
+ * Set site to null when a project has no deployed website.
+ */
 const projectsList = [
-    "Apps",
-    "Web Ports",
-    "Minecraft Port",
-    "C00lGUI",
-    "FATED",
-    "Service Hour Tracker",
-    "Code Sandbox",
-    "Audio Visualizer",
-    "Webhookd",
-    "Note Summarizer"
+    { name: "Apps", repo: "Apps", site: "Apps", description: "Project directory and app launcher" },
+    { name: "Web Ports", repo: "Web-Ports", site: "Web-Ports", description: "Browser game ports and experiments" },
+    { name: "Minecraft", repo: "Minecraft", site: "Minecraft", description: "Minecraft-related project" },
+    { name: "A-90", repo: "90", site: "90", description: "A-90 web experience" },
+    { name: "A-90b", repo: "a90b", site: "a90b", description: "A-90b immersive project" },
+    { name: "MineSwept", repo: "MineSwept", site: "MineSwept", description: "Minesweeper-inspired game" },
+    { name: "Black Knife", repo: "Black_Knife", site: "Black_Knife", description: "Public creative project" },
+    { name: "File Encoder V2", repo: "FileEncoderV2", site: "FileEncoderV2", description: "File encoding and decoding utility" },
+    { name: "Downloads", repo: "Downloads", site: "Downloads", description: "Download resources" },
+    { name: "Camera Pro V2", repo: "Camera-Pro-v2", site: "Camera-Pro-v2", description: "Camera tool project" },
+    { name: "Super Awesome Clicker", repo: "Super-Aw3some-clicker-game", site: "Super-Aw3some-clicker-game", description: "Clicker game" },
+    { name: "Memorize by Heart", repo: "Memorizebyheart", site: "Memorizebyheart", description: "Memory and memorization tool" },
+    { name: "GitHub Stats", repo: "GitHub-Stats", site: "GitHub-Stats", description: "GitHub activity statistics" },
+    { name: "Audio Visualizer", repo: "Audio-Visualizer", site: "Audio-Visualizer", description: "Audio visualization experiment" },
+    { name: "File Creator", repo: "File-Creator", site: "File-Creator", description: "File creation utility" },
+    { name: "GitChat V1", repo: "GitChatV1", site: "GitChatV1", description: "GitHub Pages chat project" },
+    { name: "History Autoclear", repo: "History-Autoclear-Extension-V1.2", site: "History-Autoclear-Extension-V1.2", description: "Browser history utility" },
+    { name: "Graphite V1", repo: "Graphite-v1.0", site: "Graphite-v1.0", description: "Public web project" },
+    { name: "Service Hour Tracker", repo: "Service-Hour-Tracker", site: "Service-Hour-Tracker", description: "Service hour tracking tool" },
+    { name: "Webhooked", repo: "Webhooked", site: "Webhooked", description: "Webhook-related tool" },
+    { name: "Website Down Detector", repo: "Website-Down-Detector", site: "Website-Down-Detector", description: "Uptime monitoring dashboard" }
 ];
 
 const container = document.getElementById("projects");
+const search = document.getElementById("search");
+const refreshButton = document.getElementById("refresh");
 
-// ===== Create HTML skeleton =====
-projectsList.forEach(name => {
-    const id = safeId(name);
-    const div = document.createElement("div");
-    div.className = "project";
-    div.innerHTML = `
-        <h2>${name}</h2>
-        <p>
-            <span class="link-label">Repository:</span>
-            <a href="https://github.com/AC1DST4R/${name.replace(/\s+/g, '-')}" target="_blank">https://github.com/AC1DST4R/${name.replace(/\s+/g, '-')}</a>
-            <span class="status" id="${id}-repo" data-arrow="^">Checking...</span>
-        </p>
-        <p>
-            <span class="link-label">Website:</span>
-            <a href="https://ac1dst4r.github.io/${name.replace(/\s+/g, '-')}/" target="_blank">https://ac1dst4r.github.io/${name.replace(/\s+/g, '-')}/</a>
-            <span class="status" id="${id}-website" data-arrow="^">Checking...</span>
-        </p>
-    `;
-    container.appendChild(div);
-});
+let lastSuccessfulUpdate = null;
+let refreshTimer = null;
+let refreshing = false;
+let statusByName = new Map();
 
-// ===== Fetch status.json and update UI =====
-async function updateStatus() {
-    try {
-        const res = await fetch('public/status.json', { cache: "no-store" });
-        const data = await res.json();
+document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("project-count").textContent = projectsList.length;
 
-        data.projects.forEach(p => {
-            const id = safeId(p.name);
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
 
-            // Update repo status
-            const repoEl = document.getElementById(`${id}-repo`);
-            if (repoEl) {
-                repoEl.textContent = p.status;
-                repoEl.dataset.arrow = p.status === "Up" ? "^" : "v";
-                repoEl.className = `status ${p.status === "Up" ? 'up' : 'down'}`;
-            }
+function repoURL(project) {
+    return `https://github.com/${OWNER}/${encodeURIComponent(project.repo)}`;
+}
 
-            // Update website status
-            const webEl = document.getElementById(`${id}-website`);
-            if (webEl) {
-                webEl.textContent = p.status;
-                webEl.dataset.arrow = p.status === "Up" ? "^" : "v";
-                webEl.className = `status ${p.status === "Up" ? 'up' : 'down'}`;
-            }
-        });
-    } catch (e) {
-        console.error("Failed to fetch status.json", e);
+function siteURL(project) {
+    return project.site
+        ? `https://${OWNER.toLowerCase()}.github.io/${project.site.replace(/^\/+|\/+$/g, "")}/`
+        : null;
+}
+
+function normalizeStatus(value) {
+    const status = String(value || "").trim().toLowerCase();
+
+    if (["up", "online", "ok", "healthy", "operational"].includes(status)) return "up";
+    if (["down", "offline", "error", "failed", "unavailable"].includes(status)) return "down";
+    if (["checking", "pending", "loading"].includes(status)) return "checking";
+
+    return "unknown";
+}
+
+function statusLabel(status) {
+    return ({
+        up: "Operational",
+        down: "Offline",
+        checking: "Checking",
+        unknown: "Unknown"
+    })[status] || "Unknown";
+}
+
+function statusBadge(status) {
+    return `<span class="badge ${status}">
+        <span class="status-dot"></span>${statusLabel(status)}
+    </span>`;
+}
+
+function renderProjects() {
+    const query = search.value.trim().toLowerCase();
+
+    const filtered = projectsList.filter(project =>
+        `${project.name} ${project.description} ${project.repo}`.toLowerCase().includes(query)
+    );
+
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty">No matching projects found.</div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(project => {
+        const record = statusByName.get(project.name) || {};
+        const repoStatus = normalizeStatus(record.repoStatus ?? record.repositoryStatus ?? record.repo_status ?? record.status);
+        const websiteStatus = project.site
+            ? normalizeStatus(record.websiteStatus ?? record.siteStatus ?? record.website_status ?? record.status)
+            : "unknown";
+
+        const states = project.site ? [repoStatus, websiteStatus] : [repoStatus];
+        const overall = states.includes("down")
+            ? "down"
+            : states.every(s => s === "up")
+                ? "up"
+                : states.includes("checking")
+                    ? "checking"
+                    : "unknown";
+
+        const website = siteURL(project);
+
+        return `
+            <article class="project">
+                <div class="project-top">
+                    <div>
+                        <h3>${escapeHTML(project.name)}</h3>
+                        <p class="project-description">${escapeHTML(project.description)}</p>
+                    </div>
+                    ${statusBadge(overall)}
+                </div>
+                <div class="links">
+                    <a class="project-link" href="${repoURL(project)}" target="_blank" rel="noopener noreferrer">
+                        <span>Repository<br><strong>${statusLabel(repoStatus)}</strong></span>
+                        <strong>↗</strong>
+                    </a>
+                    ${website ? `
+                        <a class="project-link" href="${website}" target="_blank" rel="noopener noreferrer">
+                            <span>Website<br><strong>${statusLabel(websiteStatus)}</strong></span>
+                            <strong>↗</strong>
+                        </a>
+                    ` : `
+                        <span class="project-link disabled">
+                            <span>Website<br><strong>Not configured</strong></span>
+                            <strong>—</strong>
+                        </span>
+                    `}
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function updateOverview() {
+    const records = projectsList.map(project => statusByName.get(project.name) || {});
+    const states = records.flatMap(record => [
+        normalizeStatus(record.repoStatus ?? record.repositoryStatus ?? record.repo_status ?? record.status),
+        normalizeStatus(record.websiteStatus ?? record.siteStatus ?? record.website_status ?? record.status)
+    ]);
+
+    const up = states.filter(s => s === "up").length;
+    const down = states.filter(s => s === "down").length;
+    const unknown = states.filter(s => s === "unknown").length;
+
+    const overall = document.getElementById("overall");
+    const detail = document.getElementById("overall-detail");
+
+    if (!lastSuccessfulUpdate) {
+        overall.textContent = "Awaiting status data";
+        detail.textContent = "No successful status refresh yet";
+    } else if (down > 0) {
+        overall.textContent = "Some services are offline";
+        detail.textContent = `${down} check(s) offline · ${up} operational`;
+    } else if (unknown === states.length) {
+        overall.textContent = "Status unavailable";
+        detail.textContent = "The monitoring file contains no recognized status values";
+    } else if (unknown > 0) {
+        overall.textContent = "Partially monitored";
+        detail.textContent = `${up} operational · ${unknown} unknown`;
+    } else {
+        overall.textContent = "All monitored systems operational";
+        detail.textContent = `${up} successful checks`;
     }
 }
 
-// Initial update
+function updateLastUpdated() {
+    const label = document.getElementById("last-updated");
+    const detail = document.getElementById("updated-detail");
+
+    if (!lastSuccessfulUpdate) {
+        label.textContent = "Never";
+        detail.textContent = "Waiting for a successful check";
+        return;
+    }
+
+    const seconds = Math.max(0, Math.floor((Date.now() - lastSuccessfulUpdate) / 1000));
+
+    if (seconds < 60) label.textContent = `${seconds}s ago`;
+    else if (seconds < 3600) label.textContent = `${Math.floor(seconds / 60)}m ago`;
+    else if (seconds < 86400) label.textContent = `${Math.floor(seconds / 3600)}h ago`;
+    else label.textContent = `${Math.floor(seconds / 86400)}d ago`;
+
+    detail.textContent = `Updated ${new Date(lastSuccessfulUpdate).toLocaleTimeString()}`;
+}
+
+async function updateStatus() {
+    if (refreshing) return;
+
+    refreshing = true;
+    refreshButton.disabled = true;
+    document.getElementById("refresh-icon").textContent = "…";
+    document.getElementById("notice").textContent = "Fetching the latest status data…";
+
+    try {
+        const response = await fetch(`${STATUS_URL}?_=${Date.now()}`, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Status file returned HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || !Array.isArray(data.projects)) {
+            throw new Error("The status file must contain a projects array.");
+        }
+
+        const nextStatuses = new Map();
+
+        for (const project of data.projects) {
+            if (!project || !project.name) continue;
+            nextStatuses.set(String(project.name), project);
+        }
+
+        statusByName = nextStatuses;
+        lastSuccessfulUpdate = Date.now();
+
+        renderProjects();
+        updateOverview();
+        updateLastUpdated();
+
+        document.getElementById("notice").textContent =
+            `Status data loaded successfully. Automatic refresh every ${REFRESH_INTERVAL / 1000} seconds.`;
+    } catch (error) {
+        console.error("Failed to update project statuses:", error);
+
+        document.getElementById("notice").textContent =
+            "Unable to load public/status.json. Showing the most recent data available, if any.";
+
+        if (!lastSuccessfulUpdate) {
+            document.getElementById("overall").textContent = "Monitoring unavailable";
+            document.getElementById("overall-detail").textContent = "Check the status file path and format";
+        }
+    } finally {
+        refreshing = false;
+        refreshButton.disabled = false;
+        document.getElementById("refresh-icon").textContent = "↻";
+    }
+}
+
+search.addEventListener("input", renderProjects);
+refreshButton.addEventListener("click", updateStatus);
+
+renderProjects();
 updateStatus();
 
-// Refresh every 30 seconds
-setInterval(updateStatus, 30000);
-</script>
+refreshTimer = setInterval(() => {
+    updateStatus();
+}, REFRESH_INTERVAL);
 
+setInterval(updateLastUpdated, 1000);
+</script>
 </body>
 </html>
