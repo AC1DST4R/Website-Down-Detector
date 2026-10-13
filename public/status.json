@@ -1,16 +1,80 @@
 {
-  "updated": "2026-10-13T12:55:47Z",
+  "updated": "2026-10-13T13:19:18Z",
   "projects": [
     {
-      "name": "Apps",
-      "repo": "https://github.com/AC1DST4R/Apps",
-      "url": "https://ac1dst4r.github.io/Apps/",
+      "name": "Website-Down-Detector",
+      "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
+      "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "Web Ports",
+      "name": "GitHub-Stats",
+      "repo": "https://github.com/AC1DST4R/GitHub-Stats",
+      "url": "https://ac1dst4r.github.io/GitHub-Stats/",
+      "repoStatus": "Up",
+      "websiteStatus": "Down",
+      "status": "Down"
+    },
+    {
+      "name": "Sin",
+      "repo": "https://github.com/AC1DST4R/Sin",
+      "url": "https://ac1dst4r.github.io/Sin/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "3rd-Party-Camera",
+      "repo": "https://github.com/AC1DST4R/3rd-Party-Camera",
+      "url": "https://ac1dst4r.github.io/3rd-Party-Camera/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "MUSIC",
+      "repo": "https://github.com/AC1DST4R/MUSIC",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Github-Bulk-Update",
+      "repo": "https://github.com/AC1DST4R/Github-Bulk-Update",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Wiki",
+      "repo": "https://github.com/AC1DST4R/Wiki",
+      "url": "https://ac1dst4r.github.io/Wiki/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Wii-U-Jailbreaks",
+      "repo": "https://github.com/AC1DST4R/Wii-U-Jailbreaks",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Webhooked",
+      "repo": "https://github.com/AC1DST4R/Webhooked",
+      "url": "https://ac1dst4r.github.io/Webhooked/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Web-Ports",
       "repo": "https://github.com/AC1DST4R/Web-Ports",
       "url": "https://ac1dst4r.github.io/Web-Ports/",
       "repoStatus": "Up",
@@ -18,25 +82,105 @@
       "status": "Up"
     },
     {
-      "name": "Minecraft",
-      "repo": "https://github.com/AC1DST4R/Minecraft",
-      "url": "https://ac1dst4r.github.io/Minecraft/",
+      "name": "Wallpapers",
+      "repo": "https://github.com/AC1DST4R/Wallpapers",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "WallpaperCreator",
+      "repo": "https://github.com/AC1DST4R/WallpaperCreator",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Uptime-Keeper",
+      "repo": "https://github.com/AC1DST4R/Uptime-Keeper",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Super-Aw3some-clicker-game",
+      "repo": "https://github.com/AC1DST4R/Super-Aw3some-clicker-game",
+      "url": "https://ac1dst4r.github.io/Super-Aw3some-clicker-game/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "A-90",
-      "repo": "https://github.com/AC1DST4R/90",
-      "url": "https://ac1dst4r.github.io/90/",
+      "name": "StarlightAI",
+      "repo": "https://github.com/AC1DST4R/StarlightAI",
+      "url": "https://ac1dst4r.github.io/StarlightAI/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "A-90b",
-      "repo": "https://github.com/AC1DST4R/a90b",
-      "url": "https://ac1dst4r.github.io/a90b/",
+      "name": "Service-Hour-Tracker",
+      "repo": "https://github.com/AC1DST4R/Service-Hour-Tracker",
+      "url": "https://ac1dst4r.github.io/Service-Hour-Tracker/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "PS3-Jailbreak-File-Guide",
+      "repo": "https://github.com/AC1DST4R/PS3-Jailbreak-File-Guide",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Readmephotos",
+      "repo": "https://github.com/AC1DST4R/Readmephotos",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "profilecreator-web",
+      "repo": "https://github.com/AC1DST4R/profilecreator-web",
+      "url": "https://ac1dst4r.github.io/profilecreator-web/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "OnlinePatcher",
+      "repo": "https://github.com/AC1DST4R/OnlinePatcher",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "oi.buhtig.r4tsd1ca",
+      "repo": "https://github.com/AC1DST4R/oi.buhtig.r4tsd1ca",
+      "url": "https://ac1dst4r.github.io/oi.buhtig.r4tsd1ca/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "NT-GENERATOR",
+      "repo": "https://github.com/AC1DST4R/NT-GENERATOR",
+      "url": "https://ac1dst4r.github.io/NT-GENERATOR/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "mirror",
+      "repo": "https://github.com/AC1DST4R/mirror",
+      "url": "https://ac1dst4r.github.io/mirror/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
@@ -50,20 +194,52 @@
       "status": "Up"
     },
     {
-      "name": "Black Knife",
-      "repo": "https://github.com/AC1DST4R/Black_Knife",
-      "url": "https://ac1dst4r.github.io/Black_Knife/",
+      "name": "Memorizebyheart",
+      "repo": "https://github.com/AC1DST4R/Memorizebyheart",
+      "url": "https://ac1dst4r.github.io/Memorizebyheart/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "File Encoder V2",
-      "repo": "https://github.com/AC1DST4R/FileEncoderV2",
-      "url": "https://ac1dst4r.github.io/FileEncoderV2/",
+      "name": "Landing",
+      "repo": "https://github.com/AC1DST4R/Landing",
+      "url": "https://ac1dst4r.github.io/Landing/",
       "repoStatus": "Up",
-      "websiteStatus": "Down",
-      "status": "Down"
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "GitChatV2-Development",
+      "repo": "https://github.com/AC1DST4R/GitChatV2-Development",
+      "url": "https://ac1dst4r.github.io/GitChatV2-Development/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "GitChatV1",
+      "repo": "https://github.com/AC1DST4R/GitChatV1",
+      "url": "https://ac1dst4r.github.io/GitChatV1/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "FiletreeBuilder",
+      "repo": "https://github.com/AC1DST4R/FiletreeBuilder",
+      "url": "https://ac1dst4r.github.io/FiletreeBuilder/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "File-Encrypt-V2",
+      "repo": "https://github.com/AC1DST4R/File-Encrypt-V2",
+      "url": "https://ac1dst4r.github.io/File-Encrypt-V2/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Downloads",
@@ -74,7 +250,39 @@
       "status": "Up"
     },
     {
-      "name": "Camera Pro V2",
+      "name": "Dev-Notes",
+      "repo": "https://github.com/AC1DST4R/Dev-Notes",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "CTGP-7",
+      "repo": "https://github.com/AC1DST4R/CTGP-7",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Code-Sandbox",
+      "repo": "https://github.com/AC1DST4R/Code-Sandbox",
+      "url": "https://ac1dst4r.github.io/Code-Sandbox/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Chapel-Reporting",
+      "repo": "https://github.com/AC1DST4R/Chapel-Reporting",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "Camera-Pro-v2",
       "repo": "https://github.com/AC1DST4R/Camera-Pro-v2",
       "url": "https://ac1dst4r.github.io/Camera-Pro-v2/",
       "repoStatus": "Up",
@@ -82,31 +290,23 @@
       "status": "Up"
     },
     {
-      "name": "Super Awesome Clicker",
-      "repo": "https://github.com/AC1DST4R/Super-Aw3some-clicker-game",
-      "url": "https://ac1dst4r.github.io/Super-Aw3some-clicker-game/",
+      "name": "C00lGUI",
+      "repo": "https://github.com/AC1DST4R/C00lGUI",
+      "url": "https://ac1dst4r.github.io/C00lGUI/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "Memorize by Heart",
-      "repo": "https://github.com/AC1DST4R/Memorizebyheart",
-      "url": "https://ac1dst4r.github.io/Memorizebyheart/",
+      "name": "Black_Knife",
+      "repo": "https://github.com/AC1DST4R/Black_Knife",
+      "url": "https://ac1dst4r.github.io/Black_Knife/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "GitHub Stats",
-      "repo": "https://github.com/AC1DST4R/GitHub-Stats",
-      "url": "https://ac1dst4r.github.io/GitHub-Stats/",
-      "repoStatus": "Up",
-      "websiteStatus": "Down",
-      "status": "Down"
-    },
-    {
-      "name": "Audio Visualizer",
+      "name": "Audio-Visualizer",
       "repo": "https://github.com/AC1DST4R/Audio-Visualizer",
       "url": "https://ac1dst4r.github.io/Audio-Visualizer/",
       "repoStatus": "Up",
@@ -114,57 +314,65 @@
       "status": "Up"
     },
     {
-      "name": "File Creator",
-      "repo": "https://github.com/AC1DST4R/File-Creator",
-      "url": "https://ac1dst4r.github.io/File-Creator/",
+      "name": "Apps",
+      "repo": "https://github.com/AC1DST4R/Apps",
+      "url": "https://ac1dst4r.github.io/Apps/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "GitChat V1",
-      "repo": "https://github.com/AC1DST4R/GitChatV1",
-      "url": "https://ac1dst4r.github.io/GitChatV1/",
+      "name": "ADC",
+      "repo": "https://github.com/AC1DST4R/ADC",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": "ac1dst4r.github.io",
+      "repo": "https://github.com/AC1DST4R/ac1dst4r.github.io",
+      "url": "https://ac1dst4r.github.io/ac1dst4r.github.io/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "History Autoclear",
-      "repo": "https://github.com/AC1DST4R/History-Autoclear-Extension-V1.2",
-      "url": "https://ac1dst4r.github.io/History-Autoclear-Extension-V1.2/",
-      "repoStatus": "Up",
-      "websiteStatus": "Down",
-      "status": "Down"
-    },
-    {
-      "name": "Graphite V1",
-      "repo": "https://github.com/AC1DST4R/Graphite-v1.0",
-      "url": "https://ac1dst4r.github.io/Graphite-v1.0/",
-      "repoStatus": "Up",
-      "websiteStatus": "Down",
-      "status": "Down"
-    },
-    {
-      "name": "Service Hour Tracker",
-      "repo": "https://github.com/AC1DST4R/Service-Hour-Tracker",
-      "url": "https://ac1dst4r.github.io/Service-Hour-Tracker/",
+      "name": "A-Message-For-You",
+      "repo": "https://github.com/AC1DST4R/A-Message-For-You",
+      "url": "https://ac1dst4r.github.io/A-Message-For-You/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "Webhooked",
-      "repo": "https://github.com/AC1DST4R/Webhooked",
-      "url": "https://ac1dst4r.github.io/Webhooked/",
+      "name": "a90b",
+      "repo": "https://github.com/AC1DST4R/a90b",
+      "url": "https://ac1dst4r.github.io/a90b/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
     },
     {
-      "name": "Website Down Detector",
-      "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
-      "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
+      "name": "90",
+      "repo": "https://github.com/AC1DST4R/90",
+      "url": "https://ac1dst4r.github.io/90/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": ".github",
+      "repo": "https://github.com/AC1DST4R/.github",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
+    {
+      "name": ".acid-file-encryptor",
+      "repo": "https://github.com/AC1DST4R/.acid-file-encryptor",
+      "url": "https://ac1dst4r.github.io/.acid-file-encryptor/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
