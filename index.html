@@ -3,16 +3,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090b10">
-<meta name="description" content="Live uptime monitoring for public AC1DST4R projects and websites.">
+<meta name="description" content="Live repository directory and uptime dashboard for public AC1DST4R projects.">
 <title>AC1DST4R Status Center</title>
 <style>
 :root {
     color-scheme: dark;
     --bg: #090b10;
     --panel: #10141c;
-    --panel-hover: #151b26;
+    --hover: #151b26;
     --border: #252c39;
     --text: #f0f3f8;
     --muted: #8d98aa;
@@ -26,16 +26,13 @@ body {
     margin: 0;
     min-height: 100vh;
     padding: 36px 22px 24px;
-    background:
-        radial-gradient(ellipse at 50% -15%, #222d4a 0%, transparent 55%),
-        var(--bg);
+    background: radial-gradient(ellipse at 50% -15%, #222d4a 0%, transparent 55%), var(--bg);
     color: var(--text);
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 a { color: inherit; text-decoration: none; }
 a:hover { color: var(--accent); }
-button, a { -webkit-tap-highlight-color: transparent; }
-button { font: inherit; }
+button, input { font: inherit; }
 .container { max-width: 1120px; margin: 0 auto; }
 header { margin-bottom: 30px; }
 .topline {
@@ -76,18 +73,8 @@ h1 {
     line-height: 1.08;
     letter-spacing: -2px;
 }
-.subtitle {
-    max-width: 620px;
-    color: var(--muted);
-    line-height: 1.7;
-}
-.account-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: #b9c4d6;
-    font-size: 13px;
-}
+.subtitle { max-width: 650px; color: var(--muted); line-height: 1.7; }
+.account-link { color: #b9c4d6; font-size: 13px; }
 .overview {
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr;
@@ -101,38 +88,17 @@ h1 {
     border-radius: 17px;
     background: linear-gradient(145deg, #141923, #0e1118);
 }
-.metric-label {
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 600;
-}
+.metric-label { color: var(--muted); font-size: 12px; font-weight: 600; }
 .metric-value {
     display: block;
     margin-top: 13px;
     font-size: 27px;
     font-weight: 750;
     letter-spacing: -.7px;
+    overflow-wrap: anywhere;
 }
-.metric-value.small { font-size: 21px; }
-.metric-detail {
-    display: block;
-    margin-top: 7px;
-    color: var(--muted);
-    font-size: 12px;
-}
-.live-dot, .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: var(--yellow);
-}
-.live-dot {
-    margin-right: 8px;
-    background: var(--green);
-    box-shadow: 0 0 12px #43d9a355;
-}
+.metric-value.small { font-size: 20px; }
+.metric-detail { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; }
 .section-heading {
     display: flex;
     justify-content: space-between;
@@ -144,7 +110,7 @@ h1 {
 .section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
 .actions { display: flex; align-items: center; gap: 10px; }
 .search {
-    width: 210px;
+    width: 240px;
     max-width: 45vw;
     padding: 10px 12px;
     border: 1px solid var(--border);
@@ -165,10 +131,8 @@ h1 {
     background: #1a2233;
     color: #dce3ff;
     cursor: pointer;
-    transition: background .2s, transform .2s;
 }
 .refresh:hover { background: #252f46; }
-.refresh:active { transform: scale(.97); }
 .refresh:disabled { opacity: .6; cursor: wait; }
 .projects {
     display: grid;
@@ -183,11 +147,7 @@ h1 {
     background: linear-gradient(145deg, #131821, #0e1117);
     transition: border-color .2s, transform .2s, background .2s;
 }
-.project:hover {
-    border-color: #414d66;
-    background: var(--panel-hover);
-    transform: translateY(-2px);
-}
+.project:hover { border-color: #414d66; background: var(--hover); transform: translateY(-2px); }
 .project-top {
     display: flex;
     justify-content: space-between;
@@ -195,18 +155,8 @@ h1 {
     gap: 12px;
     margin-bottom: 18px;
 }
-.project h3 {
-    margin: 0;
-    overflow-wrap: anywhere;
-    font-size: 16px;
-    font-weight: 700;
-}
-.project-description {
-    margin: 6px 0 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.5;
-}
+.project h3 { margin: 0; overflow-wrap: anywhere; font-size: 16px; font-weight: 700; }
+.project-description { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .badge {
     display: inline-flex;
     align-items: center;
@@ -219,20 +169,14 @@ h1 {
     font-size: 11px;
     font-weight: 750;
 }
-.badge .status-dot { width: 7px; height: 7px; }
+.dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; background: #778397; }
 .badge.up { color: var(--green); border-color: #245343; background: #10271f; }
-.badge.up .status-dot { background: var(--green); }
+.badge.up .dot { background: var(--green); }
 .badge.down { color: var(--red); border-color: #63303b; background: #2b151b; }
-.badge.down .status-dot { background: var(--red); }
+.badge.down .dot { background: var(--red); }
 .badge.checking { color: var(--yellow); }
-.badge.checking .status-dot { background: var(--yellow); animation: pulse 1.5s infinite; }
-.badge.unknown { color: #aab4c4; }
-.badge.unknown .status-dot { background: #778397; }
-.links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 9px;
-}
+.badge.checking .dot { background: var(--yellow); }
+.links { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .project-link {
     display: flex;
     align-items: center;
@@ -250,7 +194,6 @@ h1 {
 .project-link:hover { border-color: #6574b2; }
 .project-link span { overflow-wrap: anywhere; }
 .project-link strong { color: #8f9fc4; font-size: 11px; }
-.project-link.disabled { opacity: .5; cursor: default; }
 .empty {
     grid-column: 1 / -1;
     padding: 35px;
@@ -259,12 +202,7 @@ h1 {
     color: var(--muted);
     text-align: center;
 }
-.notice {
-    margin-top: 16px;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.7;
-}
+.notice { margin-top: 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 footer {
     display: flex;
     flex-wrap: wrap;
@@ -277,9 +215,6 @@ footer {
     font-size: 12px;
 }
 footer a { color: #b4c0d7; }
-@keyframes pulse {
-    50% { opacity: .35; }
-}
 @media (max-width: 720px) {
     body { padding: 24px 15px; }
     .topline { margin-bottom: 30px; }
@@ -299,10 +234,7 @@ footer a { color: #b4c0d7; }
     .project-link { padding: 10px 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: .01ms !important;
-        transition-duration: .01ms !important;
-    }
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 </style>
 </head>
@@ -314,35 +246,31 @@ footer a { color: #b4c0d7; }
                 <span class="brand-icon">✦</span>
                 <span>AC1DST4R <span style="color:var(--muted);font-weight:500">/ Status</span></span>
             </a>
-            <a class="account-link" href="https://github.com/AC1DST4R" target="_blank" rel="noopener noreferrer">
-                GitHub ↗
-            </a>
+            <a class="account-link" href="https://github.com/AC1DST4R" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
         </div>
 
         <div class="eyebrow">System monitoring</div>
         <h1>Status Center<span style="color:var(--accent)">.</span></h1>
         <div class="subtitle">
-            A live overview of public projects, repositories, and deployed websites.
-            One dashboard. No guesswork.
+            A live directory of public repositories and deployed websites.
+            Automatically discovered, filtered, and monitored.
         </div>
 
         <div class="overview">
             <div class="metric">
                 <div class="metric-label">OVERALL STATUS</div>
-                <span class="metric-value small" id="overall">
-                    <span class="live-dot"></span>Loading systems
-                </span>
-                <span class="metric-detail" id="overall-detail">Waiting for the first status check</span>
+                <span class="metric-value small" id="overall">Loading systems</span>
+                <span class="metric-detail" id="overall-detail">Checking monitoring data</span>
             </div>
             <div class="metric">
                 <div class="metric-label">PUBLIC PROJECTS</div>
                 <span class="metric-value" id="project-count">--</span>
-                <span class="metric-detail">Configured projects</span>
+                <span class="metric-detail" id="project-detail">Discovering repositories</span>
             </div>
             <div class="metric">
                 <div class="metric-label">LAST UPDATED</div>
                 <span class="metric-value small" id="last-updated">Never</span>
-                <span class="metric-detail" id="updated-detail">Waiting for a successful check</span>
+                <span class="metric-detail" id="updated-detail">Waiting for a successful refresh</span>
             </div>
         </div>
     </header>
@@ -350,20 +278,20 @@ footer a { color: #b4c0d7; }
     <main>
         <div class="section-heading">
             <div>
-                <h2>Monitored projects</h2>
-                <p>Repository and website availability</p>
+                <h2>Public projects</h2>
+                <p>Repositories and deployed websites that pass the project filters</p>
             </div>
             <div class="actions">
                 <input class="search" id="search" type="search" placeholder="Search projects..." aria-label="Search projects">
-                <button class="refresh" id="refresh" type="button">
-                    <span id="refresh-icon">↻</span> Refresh
-                </button>
+                <button class="refresh" id="refresh" type="button"><span id="refresh-icon">↻</span> Refresh</button>
             </div>
         </div>
 
-        <div class="projects" id="projects" aria-live="polite"></div>
+        <div class="projects" id="projects" aria-live="polite">
+            <div class="empty">Discovering public repositories...</div>
+        </div>
         <p class="notice" id="notice">
-            Status information is provided by the configured monitoring source.
+            Loading public repositories from GitHub and matching available monitoring records.
         </p>
     </main>
 
@@ -377,68 +305,46 @@ footer a { color: #b4c0d7; }
 "use strict";
 
 const OWNER = "AC1DST4R";
+const API_URL = `https://api.github.com/users/${OWNER}/repos?type=owner&per_page=100&sort=updated`;
 const STATUS_URL = "public/status.json";
-const REFRESH_INTERVAL = 30000;
+const REFRESH_INTERVAL = 300000;
+const STALE_DAYS = 365;
 
-/*
- * Only include projects confirmed to be public.
- * Change repo or site when a repository or Pages URL uses another slug.
- * Set site to null when a project has no deployed website.
- */
-const projectsList = [
-    { name: "Apps", repo: "Apps", site: "Apps", description: "Project directory and app launcher" },
-    { name: "Web Ports", repo: "Web-Ports", site: "Web-Ports", description: "Browser game ports and experiments" },
-    { name: "Minecraft", repo: "Minecraft", site: "Minecraft", description: "Minecraft-related project" },
-    { name: "A-90", repo: "90", site: "90", description: "A-90 web experience" },
-    { name: "A-90b", repo: "a90b", site: "a90b", description: "A-90b immersive project" },
-    { name: "MineSwept", repo: "MineSwept", site: "MineSwept", description: "Minesweeper-inspired game" },
-    { name: "Black Knife", repo: "Black_Knife", site: "Black_Knife", description: "Public creative project" },
-    { name: "File Encoder V2", repo: "FileEncoderV2", site: "FileEncoderV2", description: "File encoding and decoding utility" },
-    { name: "Downloads", repo: "Downloads", site: "Downloads", description: "Download resources" },
-    { name: "Camera Pro V2", repo: "Camera-Pro-v2", site: "Camera-Pro-v2", description: "Camera tool project" },
-    { name: "Super Awesome Clicker", repo: "Super-Aw3some-clicker-game", site: "Super-Aw3some-clicker-game", description: "Clicker game" },
-    { name: "Memorize by Heart", repo: "Memorizebyheart", site: "Memorizebyheart", description: "Memory and memorization tool" },
-    { name: "GitHub Stats", repo: "GitHub-Stats", site: "GitHub-Stats", description: "GitHub activity statistics" },
-    { name: "Audio Visualizer", repo: "Audio-Visualizer", site: "Audio-Visualizer", description: "Audio visualization experiment" },
-    { name: "File Creator", repo: "File-Creator", site: "File-Creator", description: "File creation utility" },
-    { name: "GitChat V1", repo: "GitChatV1", site: "GitChatV1", description: "GitHub Pages chat project" },
-    { name: "History Autoclear", repo: "History-Autoclear-Extension-V1.2", site: "History-Autoclear-Extension-V1.2", description: "Browser history utility" },
-    { name: "Graphite V1", repo: "Graphite-v1.0", site: "Graphite-v1.0", description: "Public web project" },
-    { name: "Service Hour Tracker", repo: "Service-Hour-Tracker", site: "Service-Hour-Tracker", description: "Service hour tracking tool" },
-    { name: "Webhooked", repo: "Webhooked", site: "Webhooked", description: "Webhook-related tool" },
-    { name: "Website Down Detector", repo: "Website-Down-Detector", site: "Website-Down-Detector", description: "Uptime monitoring dashboard" }
-];
+const EXCLUDED_NAMES = new Set([
+    "historyautoclear",
+    "graphitev1",
+    "githubbulkupdater",
+    "fileencoderv2",
+    "gitchatv2",
+    "githubv2development"
+]);
+
+const EXTENSION_PATTERN =
+    /(^|[-_. ])(extension|extensions|browser-extension|firefox-addon|chrome-addon|userscript)([-_. ]|$)/i;
 
 const container = document.getElementById("projects");
 const search = document.getElementById("search");
 const refreshButton = document.getElementById("refresh");
 
+let repositories = [];
+let statusByRepo = new Map();
 let lastSuccessfulUpdate = null;
-let refreshTimer = null;
 let refreshing = false;
-let statusByName = new Map();
 
 document.getElementById("year").textContent = new Date().getFullYear();
-document.getElementById("project-count").textContent = projectsList.length;
+
+function normalizeName(value) {
+    return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
 
 function escapeHTML(value) {
-    return String(value).replace(/[&<>"']/g, char => ({
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#39;"
     })[char]);
-}
-
-function repoURL(project) {
-    return `https://github.com/${OWNER}/${encodeURIComponent(project.repo)}`;
-}
-
-function siteURL(project) {
-    return project.site
-        ? `https://${OWNER.toLowerCase()}.github.io/${project.site.replace(/^\/+|\/+$/g, "")}/`
-        : null;
 }
 
 function normalizeStatus(value) {
@@ -460,64 +366,131 @@ function statusLabel(status) {
     })[status] || "Unknown";
 }
 
-function statusBadge(status) {
-    return `<span class="badge ${status}">
-        <span class="status-dot"></span>${statusLabel(status)}
-    </span>`;
+function badge(status) {
+    return `<span class="badge ${status}"><span class="dot"></span>${statusLabel(status)}</span>`;
+}
+
+function isExcluded(repo) {
+    const normalized = normalizeName(repo.name);
+    const description = repo.description || "";
+    const topics = Array.isArray(repo.topics) ? repo.topics.join(" ") : "";
+    const searchable = `${repo.name} ${description} ${topics}`;
+
+    if (EXCLUDED_NAMES.has(normalized)) return true;
+
+    if (
+        normalized.includes("historyautoclear") ||
+        normalized.includes("githubbulkupdater") ||
+        normalized.includes("githubv2development") ||
+        normalized.includes("gitchatv2") ||
+        normalized.includes("fileencoderv2") ||
+        /^graphitev\d+/.test(normalized)
+    ) return true;
+
+    if (EXTENSION_PATTERN.test(searchable)) return true;
+
+    if (/\b(browser|firefox|chrome|web)\s+extension(s)?\b/i.test(searchable)) return true;
+
+    return false;
+}
+
+function isStale(repo) {
+    if (!repo.pushed_at) return true;
+
+    const pushed = new Date(repo.pushed_at).getTime();
+    const cutoff = Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000;
+
+    return !Number.isFinite(pushed) || pushed < cutoff;
+}
+
+function getSiteURL(repo) {
+    if (!repo.has_pages) return null;
+
+    if (repo.name.toLowerCase() === `${OWNER.toLowerCase()}.github.io`) {
+        return `https://${OWNER.toLowerCase()}.github.io/`;
+    }
+
+    return `https://${OWNER.toLowerCase()}.github.io/${encodeURIComponent(repo.name)}/`;
+}
+
+function findStatusRecord(repo) {
+    const exact = statusByRepo.get(normalizeName(repo.name));
+    if (exact) return exact;
+
+    for (const record of statusByRepo.values()) {
+        const slug = String(record.repo || "").split("/").filter(Boolean).pop();
+        if (slug && normalizeName(slug) === normalizeName(repo.name)) return record;
+    }
+
+    return null;
+}
+
+function getRepoStatus(repo) {
+    const record = findStatusRecord(repo);
+    return record
+        ? normalizeStatus(record.repoStatus ?? record.repositoryStatus ?? record.repo_status ?? record.status)
+        : "unknown";
+}
+
+function getWebsiteStatus(repo) {
+    if (!repo.has_pages) return "unknown";
+
+    const record = findStatusRecord(repo);
+    return record
+        ? normalizeStatus(record.websiteStatus ?? record.siteStatus ?? record.website_status ?? record.status)
+        : "unknown";
 }
 
 function renderProjects() {
     const query = search.value.trim().toLowerCase();
 
-    const filtered = projectsList.filter(project =>
-        `${project.name} ${project.description} ${project.repo}`.toLowerCase().includes(query)
-    );
+    const filtered = repositories.filter(repo => {
+        const haystack = `${repo.name} ${repo.description || ""} ${repo.language || ""}`.toLowerCase();
+        return haystack.includes(query);
+    });
 
     if (!filtered.length) {
-        container.innerHTML = '<div class="empty">No matching projects found.</div>';
+        container.innerHTML = `<div class="empty">${repositories.length ? "No matching projects found." : "No repositories passed the current filters."}</div>`;
         return;
     }
 
-    container.innerHTML = filtered.map(project => {
-        const record = statusByName.get(project.name) || {};
-        const repoStatus = normalizeStatus(record.repoStatus ?? record.repositoryStatus ?? record.repo_status ?? record.status);
-        const websiteStatus = project.site
-            ? normalizeStatus(record.websiteStatus ?? record.siteStatus ?? record.website_status ?? record.status)
-            : "unknown";
+    container.innerHTML = filtered.map(repo => {
+        const repoStatus = getRepoStatus(repo);
+        const websiteStatus = getWebsiteStatus(repo);
+        const website = getSiteURL(repo);
 
-        const states = project.site ? [repoStatus, websiteStatus] : [repoStatus];
-        const overall = states.includes("down")
+        const overall = repoStatus === "down" || websiteStatus === "down"
             ? "down"
-            : states.every(s => s === "up")
+            : repoStatus === "up" && (!website || websiteStatus === "up")
                 ? "up"
-                : states.includes("checking")
-                    ? "checking"
-                    : "unknown";
+                : "unknown";
 
-        const website = siteURL(project);
+        const description = repo.description || (repo.language ? `${repo.language} project` : "Public GitHub repository");
+        const updated = new Date(repo.pushed_at).toLocaleDateString();
 
         return `
             <article class="project">
                 <div class="project-top">
                     <div>
-                        <h3>${escapeHTML(project.name)}</h3>
-                        <p class="project-description">${escapeHTML(project.description)}</p>
+                        <h3>${escapeHTML(repo.name)}</h3>
+                        <p class="project-description">${escapeHTML(description)}</p>
+                        <p class="project-description">Last pushed: ${escapeHTML(updated)}</p>
                     </div>
-                    ${statusBadge(overall)}
+                    ${badge(overall)}
                 </div>
                 <div class="links">
-                    <a class="project-link" href="${repoURL(project)}" target="_blank" rel="noopener noreferrer">
+                    <a class="project-link" href="${escapeHTML(repo.html_url)}" target="_blank" rel="noopener noreferrer">
                         <span>Repository<br><strong>${statusLabel(repoStatus)}</strong></span>
                         <strong>↗</strong>
                     </a>
                     ${website ? `
-                        <a class="project-link" href="${website}" target="_blank" rel="noopener noreferrer">
-                            <span>Website<br><strong>${statusLabel(websiteStatus)}</strong></span>
+                        <a class="project-link" href="${escapeHTML(website)}" target="_blank" rel="noopener noreferrer">
+                            <span>GitHub Pages<br><strong>${statusLabel(websiteStatus)}</strong></span>
                             <strong>↗</strong>
                         </a>
                     ` : `
-                        <span class="project-link disabled">
-                            <span>Website<br><strong>Not configured</strong></span>
+                        <span class="project-link">
+                            <span>Website<br><strong>Not detected</strong></span>
                             <strong>—</strong>
                         </span>
                     `}
@@ -528,35 +501,37 @@ function renderProjects() {
 }
 
 function updateOverview() {
-    const records = projectsList.map(project => statusByName.get(project.name) || {});
-    const states = records.flatMap(record => [
-        normalizeStatus(record.repoStatus ?? record.repositoryStatus ?? record.repo_status ?? record.status),
-        normalizeStatus(record.websiteStatus ?? record.siteStatus ?? record.website_status ?? record.status)
-    ]);
+    const repoStates = repositories.map(getRepoStatus);
+    const websiteStates = repositories.filter(repo => repo.has_pages).map(getWebsiteStatus);
+    const states = [...repoStates, ...websiteStates];
 
-    const up = states.filter(s => s === "up").length;
-    const down = states.filter(s => s === "down").length;
-    const unknown = states.filter(s => s === "unknown").length;
+    const up = states.filter(status => status === "up").length;
+    const down = states.filter(status => status === "down").length;
+    const unknown = states.filter(status => status === "unknown").length;
 
     const overall = document.getElementById("overall");
     const detail = document.getElementById("overall-detail");
 
-    if (!lastSuccessfulUpdate) {
-        overall.textContent = "Awaiting status data";
-        detail.textContent = "No successful status refresh yet";
+    if (!repositories.length) {
+        overall.textContent = "No projects found";
+        detail.textContent = "Check the GitHub API response and filters";
     } else if (down > 0) {
-        overall.textContent = "Some services are offline";
+        overall.textContent = "Issues detected";
         detail.textContent = `${down} check(s) offline · ${up} operational`;
     } else if (unknown === states.length) {
-        overall.textContent = "Status unavailable";
-        detail.textContent = "The monitoring file contains no recognized status values";
+        overall.textContent = "Awaiting monitoring data";
+        detail.textContent = "Repository discovery succeeded; status records are not available yet";
     } else if (unknown > 0) {
         overall.textContent = "Partially monitored";
         detail.textContent = `${up} operational · ${unknown} unknown`;
     } else {
-        overall.textContent = "All monitored systems operational";
+        overall.textContent = "All monitored checks operational";
         detail.textContent = `${up} successful checks`;
     }
+
+    document.getElementById("project-count").textContent = repositories.length;
+    document.getElementById("project-detail").textContent =
+        `Excludes extensions and projects stale for ${STALE_DAYS}+ days`;
 }
 
 function updateLastUpdated() {
@@ -565,7 +540,7 @@ function updateLastUpdated() {
 
     if (!lastSuccessfulUpdate) {
         label.textContent = "Never";
-        detail.textContent = "Waiting for a successful check";
+        detail.textContent = "Waiting for a successful refresh";
         return;
     }
 
@@ -576,7 +551,72 @@ function updateLastUpdated() {
     else if (seconds < 86400) label.textContent = `${Math.floor(seconds / 3600)}h ago`;
     else label.textContent = `${Math.floor(seconds / 86400)}d ago`;
 
-    detail.textContent = `Updated ${new Date(lastSuccessfulUpdate).toLocaleTimeString()}`;
+    detail.textContent = `Refreshed ${new Date(lastSuccessfulUpdate).toLocaleTimeString()}`;
+}
+
+async function fetchAllRepositories() {
+    const all = [];
+    let page = 1;
+
+    while (true) {
+        const response = await fetch(`${API_URL}&page=${page}`, {
+            cache: "no-store",
+            headers: { "Accept": "application/vnd.github+json" }
+        });
+
+        if (!response.ok) {
+            throw new Error(`GitHub API returned HTTP ${response.status}`);
+        }
+
+        const batch = await response.json();
+        if (!Array.isArray(batch)) throw new Error("Unexpected GitHub API response.");
+
+        all.push(...batch);
+
+        if (batch.length < 100) break;
+        page++;
+
+        if (page > 10) break;
+    }
+
+    const cutoff = Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000;
+
+    return all.filter(repo =>
+        repo &&
+        repo.owner &&
+        repo.owner.login.toLowerCase() === OWNER.toLowerCase() &&
+        repo.private === false &&
+        repo.fork === false &&
+        !repo.archived &&
+        !repo.disabled &&
+        !isExcluded(repo) &&
+        !isStale(repo) &&
+        new Date(repo.pushed_at).getTime() >= cutoff
+    );
+}
+
+async function fetchStatusFile() {
+    try {
+        const response = await fetch(`${STATUS_URL}?_=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (!data || !Array.isArray(data.projects)) return;
+
+        const next = new Map();
+
+        for (const record of data.projects) {
+            if (!record || !record.name) continue;
+            next.set(normalizeName(record.name), record);
+
+            const slug = String(record.repo || "").split("/").filter(Boolean).pop();
+            if (slug) next.set(normalizeName(slug), record);
+        }
+
+        statusByRepo = next;
+    } catch (error) {
+        console.warn("Could not load status.json:", error);
+    }
 }
 
 async function updateStatus() {
@@ -585,48 +625,36 @@ async function updateStatus() {
     refreshing = true;
     refreshButton.disabled = true;
     document.getElementById("refresh-icon").textContent = "…";
-    document.getElementById("notice").textContent = "Fetching the latest status data…";
+    document.getElementById("notice").textContent = "Discovering public repositories and loading monitoring records…";
 
     try {
-        const response = await fetch(`${STATUS_URL}?_=${Date.now()}`, {
-            cache: "no-store"
+        const [foundRepositories] = await Promise.all([
+            fetchAllRepositories(),
+            fetchStatusFile()
+        ]);
+
+        repositories = foundRepositories.sort((a, b) => {
+            const dateA = new Date(a.pushed_at).getTime() || 0;
+            const dateB = new Date(b.pushed_at).getTime() || 0;
+            return dateB - dateA;
         });
 
-        if (!response.ok) {
-            throw new Error(`Status file returned HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (!data || !Array.isArray(data.projects)) {
-            throw new Error("The status file must contain a projects array.");
-        }
-
-        const nextStatuses = new Map();
-
-        for (const project of data.projects) {
-            if (!project || !project.name) continue;
-            nextStatuses.set(String(project.name), project);
-        }
-
-        statusByName = nextStatuses;
         lastSuccessfulUpdate = Date.now();
-
         renderProjects();
         updateOverview();
         updateLastUpdated();
 
         document.getElementById("notice").textContent =
-            `Status data loaded successfully. Automatic refresh every ${REFRESH_INTERVAL / 1000} seconds.`;
+            `Loaded ${repositories.length} public repositories. Extensions, archived projects, excluded projects, and repositories with no activity in the last ${STALE_DAYS} days are hidden. Monitoring statuses appear when a matching record exists in public/status.json.`;
     } catch (error) {
-        console.error("Failed to update project statuses:", error);
-
+        console.error("Failed to load repositories:", error);
         document.getElementById("notice").textContent =
-            "Unable to load public/status.json. Showing the most recent data available, if any.";
+            `Unable to retrieve repositories from GitHub: ${error.message}. Try refreshing in a moment.`;
 
-        if (!lastSuccessfulUpdate) {
-            document.getElementById("overall").textContent = "Monitoring unavailable";
-            document.getElementById("overall-detail").textContent = "Check the status file path and format";
+        if (!repositories.length) {
+            container.innerHTML = '<div class="empty">Repository discovery failed. Check your connection or GitHub API rate limit.</div>';
+            document.getElementById("overall").textContent = "Discovery unavailable";
+            document.getElementById("overall-detail").textContent = "Could not load the public repository list";
         }
     } finally {
         refreshing = false;
@@ -640,11 +668,7 @@ refreshButton.addEventListener("click", updateStatus);
 
 renderProjects();
 updateStatus();
-
-refreshTimer = setInterval(() => {
-    updateStatus();
-}, REFRESH_INTERVAL);
-
+setInterval(updateStatus, REFRESH_INTERVAL);
 setInterval(updateLastUpdated, 1000);
 </script>
 </body>
