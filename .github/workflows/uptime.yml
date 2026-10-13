@@ -1,3 +1,4 @@
+
 name: Uptime Monitor
 
 on:
@@ -8,83 +9,242 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: false
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq curl
 
-      - name: Check sites & send alerts
+      - name: Check repositories and websites
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_KEY }}
+        shell: bash
         run: |
-          set -e
+          set -uo pipefail
 
-          STATUS_FILE=public/status.json
+          STATUS_FILE="public/status.json"
           mkdir -p public
 
           if [ ! -f "$STATUS_FILE" ]; then
-            echo '{"updated":"", "projects":[]}' > "$STATUS_FILE"
+            printf '{"updated":"","projects":[]}\n' > "$STATUS_FILE"
           fi
 
-          tmpfile=$(mktemp)
+          if ! jq -e '.projects | type == "array"' "$STATUS_FILE" >/dev/null 2>&1; then
+            echo "Invalid status.json format."
+            exit 1
+          fi
 
-          check() {
-            NAME="$1"
-            URL="$2"
+          TMPDIR_MONITOR=$(mktemp -d)
+          trap 'rm -rf "$TMPDIR_MONITOR"' EXIT
 
-            CODE=$(curl -o /dev/null -s -L -w "%{http_code}" --max-time 10 "$URL")
+          RESULTS="$TMPDIR_MONITOR/projects.jsonl"
+          : > "$RESULTS"
 
-            if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
-              STATUS="Up"
+          check_url() {
+            local url="$1"
+            local code
+
+            code=$(curl \
+              --silent \
+              --show-error \
+              --location \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              --connect-timeout 5 \
+              --max-time 15 \
+              "$url" 2>/dev/null) || code="000"
+
+            if [[ "$code" =~ ^[0-9]{3}$ ]] &&
+               (( 10#$code >= 200 && 10#$code < 400 )); then
+              printf 'Up'
             else
-              STATUS="Down"
+              printf 'Down'
             fi
-
-            PREV=$(jq -r --arg name "$NAME" '.projects[] | select(.name==$name) | .status // empty' "$STATUS_FILE")
-
-            if [ "$STATUS" != "$PREV" ]; then
-              echo "State change for $NAME: $PREV → $STATUS"
-
-              curl -X POST "$WEBHOOK_URL" \
-                -H "Content-Type: application/json" \
-                -d "$(jq -n \
-                  --arg project "$NAME" \
-                  --arg status "$STATUS" \
-                  --arg url "$URL" \
-                  --arg previous "$PREV" \
-                  '{project:$project,status:$status,url:$url,previous:$previous}')"
-            fi
-
-            jq --arg name "$NAME" --arg url "$URL" --arg status "$STATUS" '
-              .projects |= (map(select(.name != $name)) + [{
-                name: $name,
-                url: $url,
-                status: $status
-              }])
-            ' "$STATUS_FILE" > "$tmpfile" && mv "$tmpfile" "$STATUS_FILE"
           }
 
-          check "Apps" "https://ac1dst4r.github.io/Apps/"
-          check "Web Ports" "https://ac1dst4r.github.io/Web-Ports"
-          check "Minecraft Port" "https://ac1dst4r.github.io/Minecraft"
-          check "FATED" "https://ac1dst4r.github.io/FATED"
-          check "Service Hour Tracker" "https://ac1dst4r.github.io/Service-Hour-Tracker"
-          check "Code Sandbox" "https://ac1dst4r.github.io/Code-Sandbox"
-          check "Webhookd" "https://ac1dst4r.github.io/Webhookd"
+          check_project() {
+            local name="$1"
+            local repo="$2"
+            local site="$3"
+            local repo_url="https://github.com/AC1DST4R/$repo"
+            local repo_status
+            local website_status
+            local previous_repo
+            local previous_website
+            local previous_status
+            local current_status
+            local result
 
-          jq --arg t "$(date -u +%FT%TZ)" '.updated=$t' "$STATUS_FILE" > "$tmpfile" && mv "$tmpfile" "$STATUS_FILE"
+            echo "Checking $name..."
+
+            repo_status=$(check_url "$repo_url")
+            website_status=$(check_url "$site")
+
+            previous_repo=$(jq -r \
+              --arg name "$name" \
+              '.projects[] | select(.name == $name) | (.repoStatus // .status // "Unknown")' \
+              "$STATUS_FILE" | head -n 1)
+
+            previous_website=$(jq -r \
+              --arg name "$name" \
+              '.projects[] | select(.name == $name) | (.websiteStatus // .status // "Unknown")' \
+              "$STATUS_FILE" | head -n 1)
+
+            previous_repo="${previous_repo:-Unknown}"
+            previous_website="${previous_website:-Unknown}"
+
+            echo "  Repository: $repo_status (previous: $previous_repo)"
+            echo "  Website:    $website_status (previous: $previous_website)"
+
+            for result in \
+              "Repository|$repo_url|$previous_repo|$repo_status" \
+              "Website|$site|$previous_website|$website_status"; do
+
+              IFS='|' read -r label url previous_status current_status <<< "$result"
+
+              if [[ "$previous_status" != "Unknown" &&
+                    "$previous_status" != "$current_status" ]]; then
+
+                echo "State change: $name $label: $previous_status -> $current_status"
+
+                if [[ -n "${WEBHOOK_URL:-}" ]]; then
+                  payload=$(jq -n \
+                    --arg project "$name" \
+                    --arg service "$label" \
+                    --arg status "$current_status" \
+                    --arg url "$url" \
+                    --arg previous "$previous_status" \
+                    '{
+                      project: $project,
+                      service: $service,
+                      status: $status,
+                      url: $url,
+                      previous: $previous
+                    }')
+
+                  curl \
+                    --silent \
+                    --show-error \
+                    --fail \
+                    --connect-timeout 5 \
+                    --max-time 10 \
+                    -X POST "$WEBHOOK_URL" \
+                    -H "Content-Type: application/json" \
+                    -d "$payload" \
+                    >/dev/null || echo "Warning: webhook delivery failed."
+                fi
+              fi
+            done
+
+            jq -cn \
+              --arg name "$name" \
+              --arg repo "$repo_url" \
+              --arg url "$site" \
+              --arg repoStatus "$repo_status" \
+              --arg websiteStatus "$website_status" \
+              '{
+                name: $name,
+                repo: $repo,
+                url: $url,
+                repoStatus: $repoStatus,
+                websiteStatus: $websiteStatus,
+                status: (
+                  if $repoStatus == "Down" or $websiteStatus == "Down"
+                  then "Down"
+                  elif $repoStatus == "Up" and $websiteStatus == "Up"
+                  then "Up"
+                  else "Unknown"
+                  end
+                )
+              }' >> "$RESULTS"
+          }
+
+          # Public projects only.
+          # Format: display name | GitHub repository | deployed website
+
+          check_project "Apps" \
+            "Apps" \
+            "https://ac1dst4r.github.io/Apps/"
+
+          check_project "Web Ports" \
+            "Web-Ports" \
+            "https://ac1dst4r.github.io/Web-Ports/"
+
+          check_project "A-90" \
+            "90" \
+            "https://ac1dst4r.github.io/90/"
+
+          check_project "A-90b" \
+            "a90b" \
+            "https://ac1dst4r.github.io/a90b/"
+
+          check_project "File Encoder V2" \
+            "FileEncoderV2" \
+            "https://ac1dst4r.github.io/FileEncoderV2/"
+
+          check_project "Downloads" \
+            "Downloads" \
+            "https://ac1dst4r.github.io/Downloads/"
+
+          check_project "Camera Pro V2" \
+            "Camera-Pro-v2" \
+            "https://ac1dst4r.github.io/Camera-Pro-v2/"
+
+          check_project "Super Awesome Clicker" \
+            "Super-Aw3some-clicker-game" \
+            "https://ac1dst4r.github.io/Super-Aw3some-clicker-game/"
+
+          check_project "Memorize by Heart" \
+            "Memorizebyheart" \
+            "https://ac1dst4r.github.io/Memorizebyheart/"
+
+          check_project "GitHub Stats" \
+            "GitHub-Stats" \
+            "https://ac1dst4r.github.io/GitHub-Stats/"
+
+          check_project "Website Down Detector" \
+            "Website-Down-Detector" \
+            "https://ac1dst4r.github.io/Website-Down-Detector/"
+
+          # Write the complete status file once all checks have finished.
+          jq -s \
+            --arg updated "$(date -u +%FT%TZ)" \
+            '{
+              updated: $updated,
+              projects: .
+            }' "$RESULTS" > "$TMPDIR_MONITOR/status.json"
+
+          mv "$TMPDIR_MONITOR/status.json" "$STATUS_FILE"
+
+          echo "Status file updated:"
+          jq '{updated, projectCount: (.projects | length)}' "$STATUS_FILE"
 
       - name: Commit status.json
+        shell: bash
         run: |
+          set -e
+
           git config user.name "uptime-bot"
-          git config user.email "bot@github.com"
+          git config user.email "uptime-bot@users.noreply.github.com"
+
           git add public/status.json
-          git commit -m "Update status" || exit 0
+
+          if git diff --cached --quiet; then
+            echo "No status changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update uptime status"
           git push
