@@ -24,36 +24,35 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Discover eligible public repositories
-        id: discover
         shell: bash
         run: |
           set -euo pipefail
 
           OWNER="AC1DST4R"
-          ALL_REPOS="[]"
+          mkdir -p .status-work
 
           for PAGE in $(seq 1 10); do
-            RESPONSE="$(curl -fsSL \
+            printf -v PAGE_FILE ".status-work/repos-%02d.json" "$PAGE"
+
+            curl -fsSL \
               --retry 3 \
               --retry-delay 2 \
-              "https://api.github.com/users/${OWNER}/repos?type=owner&per_page=100&sort=updated&page=${PAGE}")"
+              "https://api.github.com/users/${OWNER}/repos?type=owner&per_page=100&sort=updated&page=${PAGE}" \
+              -o "$PAGE_FILE"
 
-            jq -e 'type == "array"' >/dev/null <<< "$RESPONSE"
+            jq -e 'type == "array"' "$PAGE_FILE" >/dev/null
 
-            COUNT="$(jq 'length' <<< "$RESPONSE")"
-            ALL_REPOS="$(jq -cn \
-              --argjson old "$ALL_REPOS" \
-              --argjson new "$RESPONSE" \
-              '$old + $new')"
+            COUNT="$(jq 'length' "$PAGE_FILE")"
 
             if [ "$COUNT" -lt 100 ]; then
               break
             fi
           done
+
+          jq -s 'add' .status-work/repos-*.json \
+            > .status-work/all-repos.json
 
           NOW="$(date -u +%s)"
 
@@ -112,21 +111,21 @@ jobs:
                   ) <= 31536000
                 )
             ]
-            ' <<< "$ALL_REPOS" > eligible-repos.json
+            ' .status-work/all-repos.json \
+            > eligible-repos.json
 
           echo "Eligible repositories:"
           jq -r '.[].name' eligible-repos.json
 
-          echo "count=$(jq 'length' eligible-repos.json)" >> "$GITHUB_OUTPUT"
+          echo "Total eligible repositories: $(jq 'length' eligible-repos.json)"
 
       - name: Check repositories and websites
         shell: bash
         run: |
           set -euo pipefail
 
-          mkdir -p public
-
-          PROJECTS="[]"
+          mkdir -p public .status-work
+          : > .status-work/status-lines.jsonl
 
           check_url() {
             local URL="$1"
@@ -177,7 +176,7 @@ jobs:
               OVERALL_STATUS="Unknown"
             fi
 
-            PROJECT="$(jq -cn \
+            jq -cn \
               --arg name "$NAME" \
               --arg repo "$REPO_URL" \
               --arg url "$SITE_URL" \
@@ -191,38 +190,37 @@ jobs:
                 repoStatus: $repoStatus,
                 websiteStatus: $websiteStatus,
                 status: $status
-              }')"
-
-            PROJECTS="$(jq -cn \
-              --argjson old "$PROJECTS" \
-              --argjson item "$PROJECT" \
-              '$old + [$item]')"
+              }' >> .status-work/status-lines.jsonl
 
             echo "${NAME}: repository=${REPO_STATUS}, website=${WEBSITE_STATUS}"
 
           done < <(jq -c '.[]' eligible-repos.json)
 
-          NEW_STATUS="$(jq -cn \
+          jq -s \
             --arg updated "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-            --argjson projects "$PROJECTS" \
             '{
               updated: $updated,
-              projects: $projects
-            }')"
+              projects: .
+            }' .status-work/status-lines.jsonl \
+            > .status-work/new-status.json
 
           if [ -f public/status.json ]; then
-            OLD_PROJECTS="$(jq -cS '.projects // []' public/status.json)"
+            jq -S '.projects // []' public/status.json \
+              > .status-work/old-projects.json
           else
-            OLD_PROJECTS="[]"
+            printf '[]\n' > .status-work/old-projects.json
           fi
 
-          NEW_PROJECTS="$(jq -cS '.projects' <<< "$NEW_STATUS")"
+          jq -S '.projects' .status-work/new-status.json \
+            > .status-work/new-projects.json
 
-          if [ "$OLD_PROJECTS" = "$NEW_PROJECTS" ] && [ -f public/status.json ]; then
-            echo "No status changes detected. Keeping the existing status.json."
+          if ! cmp -s \
+            .status-work/old-projects.json \
+            .status-work/new-projects.json; then
+            cp .status-work/new-status.json public/status.json
+            echo "Project statuses changed."
           else
-            printf '%s\n' "$NEW_STATUS" | jq '.' > public/status.json
-            echo "Status changes detected. Updated public/status.json."
+            echo "No project status changes detected."
           fi
 
       - name: Commit updated status
@@ -236,7 +234,7 @@ jobs:
           git add public/status.json
 
           if git diff --cached --quiet; then
-            echo "No file changes to commit."
+            echo "No changes to commit."
             exit 0
           fi
 
