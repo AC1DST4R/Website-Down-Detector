@@ -69,7 +69,8 @@ jobs:
                         "githubbulkupdater",
                         "fileencoderv2",
                         "gitchatv2",
-                        "githubv2development"
+                        "githubv2development",
+                        "githubstats"
                       ] | index($n)
                     ) == null
                 )
