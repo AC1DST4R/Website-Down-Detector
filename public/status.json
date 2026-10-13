@@ -1,94 +1,93 @@
-
 {
-  "updated": "",
+  "updated": "2026-10-13T12:43:57Z",
   "projects": [
     {
       "name": "Apps",
       "repo": "https://github.com/AC1DST4R/Apps",
       "url": "https://ac1dst4r.github.io/Apps/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Web Ports",
       "repo": "https://github.com/AC1DST4R/Web-Ports",
       "url": "https://ac1dst4r.github.io/Web-Ports/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "A-90",
       "repo": "https://github.com/AC1DST4R/90",
       "url": "https://ac1dst4r.github.io/90/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "A-90b",
       "repo": "https://github.com/AC1DST4R/a90b",
       "url": "https://ac1dst4r.github.io/a90b/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "File Encoder V2",
       "repo": "https://github.com/AC1DST4R/FileEncoderV2",
       "url": "https://ac1dst4r.github.io/FileEncoderV2/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Down",
+      "status": "Down"
     },
     {
       "name": "Downloads",
       "repo": "https://github.com/AC1DST4R/Downloads",
       "url": "https://ac1dst4r.github.io/Downloads/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Camera Pro V2",
       "repo": "https://github.com/AC1DST4R/Camera-Pro-v2",
       "url": "https://ac1dst4r.github.io/Camera-Pro-v2/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Super Awesome Clicker",
       "repo": "https://github.com/AC1DST4R/Super-Aw3some-clicker-game",
       "url": "https://ac1dst4r.github.io/Super-Aw3some-clicker-game/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Memorize by Heart",
       "repo": "https://github.com/AC1DST4R/Memorizebyheart",
       "url": "https://ac1dst4r.github.io/Memorizebyheart/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "GitHub Stats",
       "repo": "https://github.com/AC1DST4R/GitHub-Stats",
       "url": "https://ac1dst4r.github.io/GitHub-Stats/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Down",
+      "status": "Down"
     },
     {
       "name": "Website Down Detector",
       "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
       "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
-      "repoStatus": "Unknown",
-      "websiteStatus": "Unknown",
-      "status": "Unknown"
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     }
   ]
 }
