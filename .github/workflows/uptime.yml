@@ -1,178 +1,244 @@
 
-name: Uptime Monitor
+name: Update Website Status
 
 on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/workflow.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: uptime-monitor
+  group: website-status-monitor
   cancel-in-progress: false
 
 jobs:
-  monitor:
+  update-status:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y jq curl
-
-      - name: Check all projects and update status.json
+      - name: Discover eligible public repositories
+        id: discover
         shell: bash
-        env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_KEY }}
         run: |
-          set -uo pipefail
+          set -euo pipefail
 
-          STATUS_FILE="public/status.json"
+          OWNER="AC1DST4R"
+          ALL_REPOS="[]"
+
+          for PAGE in $(seq 1 10); do
+            RESPONSE="$(curl -fsSL \
+              --retry 3 \
+              --retry-delay 2 \
+              "https://api.github.com/users/${OWNER}/repos?type=owner&per_page=100&sort=updated&page=${PAGE}")"
+
+            jq -e 'type == "array"' >/dev/null <<< "$RESPONSE"
+
+            COUNT="$(jq 'length' <<< "$RESPONSE")"
+            ALL_REPOS="$(jq -cn \
+              --argjson old "$ALL_REPOS" \
+              --argjson new "$RESPONSE" \
+              '$old + $new')"
+
+            if [ "$COUNT" -lt 100 ]; then
+              break
+            fi
+          done
+
+          NOW="$(date -u +%s)"
+
+          jq \
+            --argjson now "$NOW" \
+            '
+            [
+              .[]
+              | select(.private == false)
+              | select(.fork == false)
+              | select(.archived == false)
+              | select(.disabled == false)
+              | select(
+                  (
+                    .name
+                    | ascii_downcase
+                    | gsub("[^a-z0-9]"; "")
+                  ) as $n
+                  | (
+                      [
+                        "historyautoclear",
+                        "graphitev1",
+                        "githubbulkupdater",
+                        "fileencoderv2",
+                        "gitchatv2",
+                        "githubv2development"
+                      ]
+                      | index($n)
+                    ) == null
+                )
+              | select(
+                  (
+                    .name
+                    | ascii_downcase
+                    | gsub("[^a-z0-9]"; "")
+                  )
+                  | test("^graphitev[0-9]+$") | not
+                )
+              | select(
+                  (
+                    (
+                      .name + " " +
+                      (.description // "") + " " +
+                      ((.topics // []) | join(" "))
+                    )
+                    | test(
+                        "(browser|firefox|chrome|extension|webextension|addon|add-on)";
+                        "i"
+                      )
+                  ) | not
+                )
+              | select(
+                  .pushed_at != null
+                  and (
+                    $now - (.pushed_at | fromdateiso8601)
+                  ) <= 31536000
+                )
+            ]
+            ' <<< "$ALL_REPOS" > eligible-repos.json
+
+          echo "Eligible repositories:"
+          jq -r '.[].name' eligible-repos.json
+
+          echo "count=$(jq 'length' eligible-repos.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Check repositories and websites
+        shell: bash
+        run: |
+          set -euo pipefail
+
           mkdir -p public
 
-          if ! jq -e '.projects | type == "array"' "$STATUS_FILE" >/dev/null 2>&1; then
-            printf '{"updated":"","projects":[]}\n' > "$STATUS_FILE"
-          fi
-
-          TMPFILE=$(mktemp)
-          trap 'rm -f "$TMPFILE"' EXIT
+          PROJECTS="[]"
 
           check_url() {
-            local url="$1"
-            local code="000"
+            local URL="$1"
+            local CODE
 
-            code=$(curl -L -sS -o /dev/null \
+            CODE="$(curl \
+              --location \
+              --silent \
+              --show-error \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               --connect-timeout 5 \
               --max-time 15 \
-              -w "%{http_code}" \
-              "$url" 2>/dev/null) || true
+              "$URL" 2>/dev/null || true)"
 
-            if [[ "$code" =~ ^[0-9]{3}$ ]] && (( 10#$code >= 200 && 10#$code < 400 )); then
-              printf "Up"
+            if [[ "$CODE" =~ ^[23][0-9][0-9]$ ]]; then
+              printf 'Up'
             else
-              printf "Down"
+              printf 'Down'
             fi
           }
 
-          check_project() {
-            local name="$1"
-            local repo="$2"
-            local site="$3"
-            local repo_status
-            local website_status
-            local overall_status
-            local previous_repo
-            local previous_website
+          while IFS= read -r REPO; do
+            NAME="$(jq -r '.name' <<< "$REPO")"
+            REPO_URL="$(jq -r '.html_url' <<< "$REPO")"
+            HAS_PAGES="$(jq -r '.has_pages' <<< "$REPO")"
 
-            repo_status=$(check_url "$repo")
-            website_status=$(check_url "$site")
+            if [ "$HAS_PAGES" = "true" ]; then
+              if [ "$NAME" = "AC1DST4R.github.io" ]; then
+                SITE_URL="https://ac1dst4r.github.io/"
+              else
+                SITE_URL="https://ac1dst4r.github.io/${NAME}/"
+              fi
 
-            if [[ "$repo_status" == "Up" && "$website_status" == "Up" ]]; then
-              overall_status="Up"
-            elif [[ "$repo_status" == "Down" || "$website_status" == "Down" ]]; then
-              overall_status="Down"
+              WEBSITE_STATUS="$(check_url "$SITE_URL")"
             else
-              overall_status="Unknown"
+              SITE_URL=""
+              WEBSITE_STATUS="Unknown"
             fi
 
-            previous_repo=$(jq -r --arg name "$name" \
-              '[.projects[] | select(.name == $name) | (.repoStatus // .repositoryStatus // .repo_status // "Unknown")][0] // "Unknown"' \
-              "$STATUS_FILE")
+            REPO_STATUS="$(check_url "$REPO_URL")"
 
-            previous_website=$(jq -r --arg name "$name" \
-              '[.projects[] | select(.name == $name) | (.websiteStatus // .siteStatus // .website_status // "Unknown")][0] // "Unknown"' \
-              "$STATUS_FILE")
-
-            echo "$name: Repository=$repo_status, Website=$website_status"
-
-            if [[ -n "${WEBHOOK_URL:-}" ]]; then
-              if [[ "$previous_repo" != "Unknown" && "$repo_status" != "$previous_repo" ]]; then
-                curl -sS --max-time 10 -X POST "$WEBHOOK_URL" \
-                  -H "Content-Type: application/json" \
-                  -d "$(jq -n \
-                    --arg project "$name" \
-                    --arg component "Repository" \
-                    --arg status "$repo_status" \
-                    --arg previous "$previous_repo" \
-                    --arg url "$repo" \
-                    '{project:$project,component:$component,status:$status,previous:$previous,url:$url}')" \
-                  >/dev/null || true
-              fi
-
-              if [[ "$previous_website" != "Unknown" && "$website_status" != "$previous_website" ]]; then
-                curl -sS --max-time 10 -X POST "$WEBHOOK_URL" \
-                  -H "Content-Type: application/json" \
-                  -d "$(jq -n \
-                    --arg project "$name" \
-                    --arg component "Website" \
-                    --arg status "$website_status" \
-                    --arg previous "$previous_website" \
-                    --arg url "$site" \
-                    '{project:$project,component:$component,status:$status,previous:$previous,url:$url}')" \
-                  >/dev/null || true
-              fi
+            if [ "$REPO_STATUS" = "Down" ] || [ "$WEBSITE_STATUS" = "Down" ]; then
+              OVERALL_STATUS="Down"
+            elif [ "$REPO_STATUS" = "Up" ]; then
+              OVERALL_STATUS="Up"
+            else
+              OVERALL_STATUS="Unknown"
             fi
 
-            jq \
-              --arg name "$name" \
-              --arg repo "$repo" \
-              --arg url "$site" \
-              --arg repoStatus "$repo_status" \
-              --arg websiteStatus "$website_status" \
-              --arg status "$overall_status" \
-              '.projects = (
-                [.projects[] | select(.name != $name)] +
-                [{
-                  name: $name,
-                  repo: $repo,
-                  url: $url,
-                  repoStatus: $repoStatus,
-                  websiteStatus: $websiteStatus,
-                  status: $status
-                }]
-              )' "$STATUS_FILE" > "$TMPFILE" && mv "$TMPFILE" "$STATUS_FILE"
-          }
+            PROJECT="$(jq -cn \
+              --arg name "$NAME" \
+              --arg repo "$REPO_URL" \
+              --arg url "$SITE_URL" \
+              --arg repoStatus "$REPO_STATUS" \
+              --arg websiteStatus "$WEBSITE_STATUS" \
+              --arg status "$OVERALL_STATUS" \
+              '{
+                name: $name,
+                repo: $repo,
+                url: $url,
+                repoStatus: $repoStatus,
+                websiteStatus: $websiteStatus,
+                status: $status
+              }')"
 
-          check_project "Apps" "https://github.com/AC1DST4R/Apps" "https://ac1dst4r.github.io/Apps/"
-          check_project "Web Ports" "https://github.com/AC1DST4R/Web-Ports" "https://ac1dst4r.github.io/Web-Ports/"
-          check_project "Minecraft" "https://github.com/AC1DST4R/Minecraft" "https://ac1dst4r.github.io/Minecraft/"
-          check_project "A-90" "https://github.com/AC1DST4R/90" "https://ac1dst4r.github.io/90/"
-          check_project "A-90b" "https://github.com/AC1DST4R/a90b" "https://ac1dst4r.github.io/a90b/"
-          check_project "MineSwept" "https://github.com/AC1DST4R/MineSwept" "https://ac1dst4r.github.io/MineSwept/"
-          check_project "Black Knife" "https://github.com/AC1DST4R/Black_Knife" "https://ac1dst4r.github.io/Black_Knife/"
-          check_project "File Encoder V2" "https://github.com/AC1DST4R/FileEncoderV2" "https://ac1dst4r.github.io/FileEncoderV2/"
-          check_project "Downloads" "https://github.com/AC1DST4R/Downloads" "https://ac1dst4r.github.io/Downloads/"
-          check_project "Camera Pro V2" "https://github.com/AC1DST4R/Camera-Pro-v2" "https://ac1dst4r.github.io/Camera-Pro-v2/"
-          check_project "Super Awesome Clicker" "https://github.com/AC1DST4R/Super-Aw3some-clicker-game" "https://ac1dst4r.github.io/Super-Aw3some-clicker-game/"
-          check_project "Memorize by Heart" "https://github.com/AC1DST4R/Memorizebyheart" "https://ac1dst4r.github.io/Memorizebyheart/"
-          check_project "GitHub Stats" "https://github.com/AC1DST4R/GitHub-Stats" "https://ac1dst4r.github.io/GitHub-Stats/"
-          check_project "Audio Visualizer" "https://github.com/AC1DST4R/Audio-Visualizer" "https://ac1dst4r.github.io/Audio-Visualizer/"
-          check_project "File Creator" "https://github.com/AC1DST4R/File-Creator" "https://ac1dst4r.github.io/File-Creator/"
-          check_project "GitChat V1" "https://github.com/AC1DST4R/GitChatV1" "https://ac1dst4r.github.io/GitChatV1/"
-          check_project "History Autoclear" "https://github.com/AC1DST4R/History-Autoclear-Extension-V1.2" "https://ac1dst4r.github.io/History-Autoclear-Extension-V1.2/"
-          check_project "Graphite V1" "https://github.com/AC1DST4R/Graphite-v1.0" "https://ac1dst4r.github.io/Graphite-v1.0/"
-          check_project "Service Hour Tracker" "https://github.com/AC1DST4R/Service-Hour-Tracker" "https://ac1dst4r.github.io/Service-Hour-Tracker/"
-          check_project "Webhooked" "https://github.com/AC1DST4R/Webhooked" "https://ac1dst4r.github.io/Webhooked/"
-          check_project "Website Down Detector" "https://github.com/AC1DST4R/Website-Down-Detector" "https://ac1dst4r.github.io/Website-Down-Detector/"
+            PROJECTS="$(jq -cn \
+              --argjson old "$PROJECTS" \
+              --argjson item "$PROJECT" \
+              '$old + [$item]')"
 
-          jq --arg updated "$(date -u +%FT%TZ)" \
-            '.updated = $updated' "$STATUS_FILE" > "$TMPFILE" && mv "$TMPFILE" "$STATUS_FILE"
+            echo "${NAME}: repository=${REPO_STATUS}, website=${WEBSITE_STATUS}"
 
-      - name: Commit status.json
+          done < <(jq -c '.[]' eligible-repos.json)
+
+          NEW_STATUS="$(jq -cn \
+            --arg updated "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --argjson projects "$PROJECTS" \
+            '{
+              updated: $updated,
+              projects: $projects
+            }')"
+
+          if [ -f public/status.json ]; then
+            OLD_PROJECTS="$(jq -cS '.projects // []' public/status.json)"
+          else
+            OLD_PROJECTS="[]"
+          fi
+
+          NEW_PROJECTS="$(jq -cS '.projects' <<< "$NEW_STATUS")"
+
+          if [ "$OLD_PROJECTS" = "$NEW_PROJECTS" ] && [ -f public/status.json ]; then
+            echo "No status changes detected. Keeping the existing status.json."
+          else
+            printf '%s\n' "$NEW_STATUS" | jq '.' > public/status.json
+            echo "Status changes detected. Updated public/status.json."
+          fi
+
+      - name: Commit updated status
         shell: bash
         run: |
-          git config user.name "uptime-bot"
-          git config user.email "uptime-bot@users.noreply.github.com"
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add public/status.json
 
           if git diff --cached --quiet; then
-            echo "No status changes to commit."
+            echo "No file changes to commit."
             exit 0
           fi
 
-          git commit -m "Update uptime status"
+          git commit -m "Update website status"
           git push
