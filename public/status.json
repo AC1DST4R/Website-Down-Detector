@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-13T12:47:32Z",
+  "updated": "2026-10-13T12:55:47Z",
   "projects": [
     {
       "name": "Apps",
@@ -18,6 +18,14 @@
       "status": "Up"
     },
     {
+      "name": "Minecraft",
+      "repo": "https://github.com/AC1DST4R/Minecraft",
+      "url": "https://ac1dst4r.github.io/Minecraft/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
       "name": "A-90",
       "repo": "https://github.com/AC1DST4R/90",
       "url": "https://ac1dst4r.github.io/90/",
@@ -29,6 +37,22 @@
       "name": "A-90b",
       "repo": "https://github.com/AC1DST4R/a90b",
       "url": "https://ac1dst4r.github.io/a90b/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "MineSwept",
+      "repo": "https://github.com/AC1DST4R/MineSwept",
+      "url": "https://ac1dst4r.github.io/MineSwept/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Black Knife",
+      "repo": "https://github.com/AC1DST4R/Black_Knife",
+      "url": "https://ac1dst4r.github.io/Black_Knife/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
@@ -80,6 +104,62 @@
       "repoStatus": "Up",
       "websiteStatus": "Down",
       "status": "Down"
+    },
+    {
+      "name": "Audio Visualizer",
+      "repo": "https://github.com/AC1DST4R/Audio-Visualizer",
+      "url": "https://ac1dst4r.github.io/Audio-Visualizer/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "File Creator",
+      "repo": "https://github.com/AC1DST4R/File-Creator",
+      "url": "https://ac1dst4r.github.io/File-Creator/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "GitChat V1",
+      "repo": "https://github.com/AC1DST4R/GitChatV1",
+      "url": "https://ac1dst4r.github.io/GitChatV1/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "History Autoclear",
+      "repo": "https://github.com/AC1DST4R/History-Autoclear-Extension-V1.2",
+      "url": "https://ac1dst4r.github.io/History-Autoclear-Extension-V1.2/",
+      "repoStatus": "Up",
+      "websiteStatus": "Down",
+      "status": "Down"
+    },
+    {
+      "name": "Graphite V1",
+      "repo": "https://github.com/AC1DST4R/Graphite-v1.0",
+      "url": "https://ac1dst4r.github.io/Graphite-v1.0/",
+      "repoStatus": "Up",
+      "websiteStatus": "Down",
+      "status": "Down"
+    },
+    {
+      "name": "Service Hour Tracker",
+      "repo": "https://github.com/AC1DST4R/Service-Hour-Tracker",
+      "url": "https://ac1dst4r.github.io/Service-Hour-Tracker/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Webhooked",
+      "repo": "https://github.com/AC1DST4R/Webhooked",
+      "url": "https://ac1dst4r.github.io/Webhooked/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
     },
     {
       "name": "Website Down Detector",
