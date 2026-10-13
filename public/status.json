@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-13T13:19:18Z",
+  "updated": "2026-10-13T15:10:03Z",
   "projects": [
     {
       "name": "Website-Down-Detector",
@@ -10,12 +10,12 @@
       "status": "Up"
     },
     {
-      "name": "GitHub-Stats",
-      "repo": "https://github.com/AC1DST4R/GitHub-Stats",
-      "url": "https://ac1dst4r.github.io/GitHub-Stats/",
+      "name": "Plinko",
+      "repo": "https://github.com/AC1DST4R/Plinko",
+      "url": "",
       "repoStatus": "Up",
-      "websiteStatus": "Down",
-      "status": "Down"
+      "websiteStatus": "Unknown",
+      "status": "Up"
     },
     {
       "name": "Sin",
