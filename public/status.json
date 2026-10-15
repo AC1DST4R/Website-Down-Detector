@@ -1,6 +1,14 @@
 {
-  "updated": "2026-10-13T15:10:03Z",
+  "updated": "2026-10-15T16:11:20Z",
   "projects": [
+    {
+      "name": "Doggify",
+      "repo": "https://github.com/AC1DST4R/Doggify",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
     {
       "name": "Website-Down-Detector",
       "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
@@ -250,16 +258,16 @@
       "status": "Up"
     },
     {
-      "name": "Dev-Notes",
-      "repo": "https://github.com/AC1DST4R/Dev-Notes",
+      "name": "CTGP-7",
+      "repo": "https://github.com/AC1DST4R/CTGP-7",
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
       "status": "Up"
     },
     {
-      "name": "CTGP-7",
-      "repo": "https://github.com/AC1DST4R/CTGP-7",
+      "name": "Dev-Notes",
+      "repo": "https://github.com/AC1DST4R/Dev-Notes",
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
