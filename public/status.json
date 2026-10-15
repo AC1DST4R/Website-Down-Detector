@@ -1,20 +1,20 @@
 {
-  "updated": "2026-10-15T16:11:20Z",
+  "updated": "2026-10-15T19:52:07Z",
   "projects": [
-    {
-      "name": "Doggify",
-      "repo": "https://github.com/AC1DST4R/Doggify",
-      "url": "",
-      "repoStatus": "Up",
-      "websiteStatus": "Unknown",
-      "status": "Up"
-    },
     {
       "name": "Website-Down-Detector",
       "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
       "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Doggify",
+      "repo": "https://github.com/AC1DST4R/Doggify",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
       "status": "Up"
     },
     {
