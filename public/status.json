@@ -1,10 +1,18 @@
 {
-  "updated": "2026-10-16T18:00:33Z",
+  "updated": "2026-10-16T20:35:28Z",
   "projects": [
     {
       "name": "orderanindian.com",
       "repo": "https://github.com/AC1DST4R/orderanindian.com",
       "url": "https://ac1dst4r.github.io/orderanindian.com/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Website-Down-Detector",
+      "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
+      "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
@@ -21,14 +29,6 @@
       "name": "Soundcloud",
       "repo": "https://github.com/AC1DST4R/Soundcloud",
       "url": "https://ac1dst4r.github.io/Soundcloud/",
-      "repoStatus": "Up",
-      "websiteStatus": "Up",
-      "status": "Up"
-    },
-    {
-      "name": "Website-Down-Detector",
-      "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
-      "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
