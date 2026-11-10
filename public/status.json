@@ -1,6 +1,30 @@
 {
-  "updated": "2026-11-10T02:00:24Z",
+  "updated": "2026-11-10T17:08:36Z",
   "projects": [
+    {
+      "name": "Apps",
+      "repo": "https://github.com/AC1DST4R/Apps",
+      "url": "https://ac1dst4r.github.io/Apps/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "Web-Ports",
+      "repo": "https://github.com/AC1DST4R/Web-Ports",
+      "url": "https://ac1dst4r.github.io/Web-Ports/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": "ADB-Config",
+      "repo": "https://github.com/AC1DST4R/ADB-Config",
+      "url": "https://ac1dst4r.github.io/ADB-Config/",
+      "repoStatus": "Up",
+      "websiteStatus": "Up",
+      "status": "Up"
+    },
     {
       "name": "Website-Down-Detector",
       "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
@@ -28,14 +52,6 @@
     {
       "name": "Support",
       "repo": "https://github.com/AC1DST4R/Support",
-      "url": "",
-      "repoStatus": "Up",
-      "websiteStatus": "Unknown",
-      "status": "Up"
-    },
-    {
-      "name": "Mortis",
-      "repo": "https://github.com/AC1DST4R/Mortis",
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
@@ -133,14 +149,6 @@
       "name": "Webhooked",
       "repo": "https://github.com/AC1DST4R/Webhooked",
       "url": "https://ac1dst4r.github.io/Webhooked/",
-      "repoStatus": "Up",
-      "websiteStatus": "Up",
-      "status": "Up"
-    },
-    {
-      "name": "Web-Ports",
-      "repo": "https://github.com/AC1DST4R/Web-Ports",
-      "url": "https://ac1dst4r.github.io/Web-Ports/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
       "status": "Up"
@@ -383,14 +391,6 @@
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
-      "status": "Up"
-    },
-    {
-      "name": "Apps",
-      "repo": "https://github.com/AC1DST4R/Apps",
-      "url": "https://ac1dst4r.github.io/Apps/",
-      "repoStatus": "Up",
-      "websiteStatus": "Up",
       "status": "Up"
     },
     {
