@@ -1,20 +1,20 @@
 {
-  "updated": "2026-11-09T19:09:27Z",
+  "updated": "2026-11-10T02:00:24Z",
   "projects": [
-    {
-      "name": ".github",
-      "repo": "https://github.com/AC1DST4R/.github",
-      "url": "",
-      "repoStatus": "Up",
-      "websiteStatus": "Unknown",
-      "status": "Up"
-    },
     {
       "name": "Website-Down-Detector",
       "repo": "https://github.com/AC1DST4R/Website-Down-Detector",
       "url": "https://ac1dst4r.github.io/Website-Down-Detector/",
       "repoStatus": "Up",
       "websiteStatus": "Up",
+      "status": "Up"
+    },
+    {
+      "name": ".github",
+      "repo": "https://github.com/AC1DST4R/.github",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
       "status": "Up"
     },
     {
