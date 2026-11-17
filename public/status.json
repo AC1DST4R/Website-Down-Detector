@@ -1,6 +1,14 @@
 {
-  "updated": "2026-11-16T17:26:39Z",
+  "updated": "2026-11-17T00:55:19Z",
   "projects": [
+    {
+      "name": "Jarvis",
+      "repo": "https://github.com/AC1DST4R/Jarvis",
+      "url": "",
+      "repoStatus": "Up",
+      "websiteStatus": "Unknown",
+      "status": "Up"
+    },
     {
       "name": "Starcinema",
       "repo": "https://github.com/AC1DST4R/Starcinema",
@@ -346,16 +354,16 @@
       "status": "Up"
     },
     {
-      "name": "CTGP-7",
-      "repo": "https://github.com/AC1DST4R/CTGP-7",
+      "name": "Dev-Notes",
+      "repo": "https://github.com/AC1DST4R/Dev-Notes",
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
       "status": "Up"
     },
     {
-      "name": "Dev-Notes",
-      "repo": "https://github.com/AC1DST4R/Dev-Notes",
+      "name": "CTGP-7",
+      "repo": "https://github.com/AC1DST4R/CTGP-7",
       "url": "",
       "repoStatus": "Up",
       "websiteStatus": "Unknown",
